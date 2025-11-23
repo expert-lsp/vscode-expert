@@ -2,13 +2,13 @@ import * as fs from "fs";
 import { join } from "path";
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import { ExtensionContext, commands, window, workspace } from "vscode";
+import { ExtensionContext, Uri, commands, window, workspace } from "vscode";
 import { LanguageClient, LanguageClientOptions, ServerOptions } from "vscode-languageclient/node";
 import { URI } from "vscode-uri";
 import * as Commands from "./client-commands";
 import * as Configuration from "./configuration";
-import * as LanguageServer from "./language-server";
 import * as Logger from "./logger";
+import { checkAndInstall } from "./installation";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -22,11 +22,24 @@ export async function activate(context: ExtensionContext): Promise<void> {
 		return;
 	}
 
-	const startScriptOrReleaseFolderPath = await maybeAutoInstall(context);
+	ensureDirectoryExists(context.globalStorageUri);
+
+	let LanguageServerPath: string | undefined;
+
+	const releasePathOverride = Configuration.getReleasePathOverride();
+
+	if (typeof releasePathOverride === "string" && releasePathOverride.length > 0) {
+		Logger.info(`starting language server from release override: "${releasePathOverride}".`);
+
+		LanguageServerPath = releasePathOverride;
+	} else {
+		LanguageServerPath = await checkAndInstall(context);
+	}
+
 	const projectDir = Configuration.getProjectDirUri(workspace);
 
-	if (startScriptOrReleaseFolderPath !== undefined) {
-		const client = await start(startScriptOrReleaseFolderPath, projectDir);
+	if (LanguageServerPath !== undefined) {
+		const client = await start(LanguageServerPath, projectDir);
 
 		const registerCommand = Commands.getRegisterFunction((id, handler) => {
 			context.subscriptions.push(commands.registerCommand(id, handler));
@@ -42,20 +55,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
 export const deactivate = () => {
 	// noop
 };
-
-async function maybeAutoInstall(context: ExtensionContext): Promise<string | undefined> {
-	const releasePathOverride = Configuration.getReleasePathOverride();
-
-	if (releasePathOverride !== undefined && releasePathOverride !== "") {
-		Logger.info(`Release override path set to "${releasePathOverride}". Skipping auto-install.`);
-
-		return releasePathOverride as string;
-	}
-
-	Logger.info("Release override path is undefined, starting auto-install.");
-
-	return await LanguageServer.install(context.globalStorageUri, window.showErrorMessage);
-}
 
 function isExecutableFile(path: fs.PathLike): boolean {
 	const stat = fs.lstatSync(path);
@@ -115,4 +114,10 @@ async function start(
 	}
 
 	return client;
+}
+
+function ensureDirectoryExists(directory: Uri) {
+	if (!fs.existsSync(directory.fsPath)) {
+		fs.mkdirSync(directory.fsPath, { recursive: true });
+	}
 }
