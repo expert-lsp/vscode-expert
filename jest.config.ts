@@ -7,6 +7,8 @@ const config: Config = {
 	maxWorkers: "50%",
 	showSeed: true,
 	testMatch: ["<rootDir>/src/test/**/*.test.ts"],
+	// Exclude tests that use Node's test runner
+	testPathIgnorePatterns: ["/node_modules/", "installation\\.test\\.ts$"],
 	setupFilesAfterEnv: ["./testSetup.ts"],
 };
 

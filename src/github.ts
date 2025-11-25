@@ -1,6 +1,8 @@
 import * as Logger from "./logger";
 import { Endpoints } from "@octokit/types";
 
+type Releases = Endpoints["GET /repos/{owner}/{repo}/releases"]["response"]["data"];
+
 export type Release =
 	Endpoints["GET /repos/{owner}/{repo}/releases/tags/{tag}"]["response"]["data"];
 
@@ -12,7 +14,7 @@ export const GITHUB_HEADERS = {
 	"X-GitHub-Api-Version": "2022-11-28",
 };
 
-export async function fetchNightlyRelease() {
+export async function fetchNightlyRelease(): Promise<Release> {
 	const response = await fetch(
 		"https://api.github.com/repos/elixir-lang/expert/releases/tags/nightly",
 		{ headers: GITHUB_HEADERS },
@@ -23,4 +25,12 @@ export async function fetchNightlyRelease() {
 	Logger.info(`Latest release is "${nightly.name}"`);
 
 	return nightly;
+}
+
+export async function releases(): Promise<Releases> {
+	const response = await fetch("https://api.github.com/repos/elixir-lang/expert/releases", {
+		headers: GITHUB_HEADERS,
+	});
+
+	return (await response.json()) as Releases;
 }

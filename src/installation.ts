@@ -52,7 +52,7 @@ export async function checkAndInstall(context: ExtensionContext): Promise<string
 	Logger.info("Checking GitHub for new releases...");
 
 	try {
-		return compareAndInstall(context, manifest);
+		return await compareAndInstall(context, manifest);
 	} catch (e) {
 		Logger.error("An unexpected error occurred checking for updates");
 
@@ -107,6 +107,15 @@ async function compareAndInstall(
 	}
 
 	const installPath = await download(asset, context);
+
+	const newManifest: Manifest = {
+		name: asset.name,
+		version: nightlyRelease.tag_name,
+		asset_timestamp: new Date(asset.updated_at),
+		release_timestamp: new Date(nightlyRelease.updated_at as string),
+	};
+
+	await context.globalState.update("install_manifest", newManifest);
 
 	notifyAutoInstallSuccess();
 
