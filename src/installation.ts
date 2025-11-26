@@ -56,6 +56,7 @@ export async function checkAndInstall(context: ExtensionContext): Promise<string
 	} catch (e) {
 		Logger.error("An unexpected error occurred checking for updates");
 
+		// TODO: Log the error here in some intelligible way that's not gonna just be [Object object]
 		// Logger.error(e)
 
 		return Uri.joinPath(context.globalStorageUri, manifest.name).fsPath;

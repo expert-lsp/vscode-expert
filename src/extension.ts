@@ -1,10 +1,8 @@
 import * as fs from "fs";
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import { ExtensionContext, Uri, commands, window, workspace } from "vscode";
 import { LanguageClient, LanguageClientOptions, ServerOptions } from "vscode-languageclient/node";
 import { URI } from "vscode-uri";
-import * as Commands from "./client-commands";
+import * as Commands from "./commands";
 import * as Configuration from "./configuration";
 import * as Logger from "./logger";
 import { checkAndInstall } from "./installation";
@@ -28,14 +26,18 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	const projectDir = Configuration.getProjectDirUri(workspace);
 
 	if (serverOptions !== undefined) {
-		const client = await start(serverOptions, projectDir);
+		const languageClient = await start(serverOptions, projectDir);
 
-		const registerCommand = Commands.getRegisterFunction((id, handler) => {
-			context.subscriptions.push(commands.registerCommand(id, handler));
-		});
-
-		registerCommand(Commands.restartServer, { client });
-		registerCommand(Commands.reindexProject, { client });
+		context.subscriptions.push(
+			commands.registerCommand("expert.server.restart", () =>
+				Commands.restartServer(languageClient),
+			),
+			commands.registerCommand("expert.server.reindexProject", () =>
+				Commands.reindexProject(languageClient),
+			),
+		);
+	} else {
+		Logger.warn("language server startup options, will not start.")
 	}
 }
 
@@ -86,35 +88,28 @@ function ensureDirectoryExists(directory: Uri) {
 	}
 }
 
+function getStartupArgs(): string[] {
+	const flagsOverride = Configuration.getStartupFlagsOverride();
+	const flags =
+		typeof flagsOverride === "string" && flagsOverride.length > 0 ? flagsOverride : "--stdio";
+	return flags.split(/\s+/).filter(Boolean);
+}
+
+// should always log why we're returning undefined here.
 async function getServerStartupOptions(
 	context: ExtensionContext,
 ): Promise<ServerOptions | undefined> {
-	let serverOptions: ServerOptions | undefined;
-
 	const startCommandOverride = Configuration.getStartCommandOverride();
 
 	if (typeof startCommandOverride === "string" && startCommandOverride.length > 0) {
 		Logger.info(`starting language server from release override: "${startCommandOverride}".`);
-
-		serverOptions = { command: startCommandOverride };
-	} else {
-		const languageServerPath = await checkAndInstall(context);
-
-		if (typeof languageServerPath !== "undefined") {
-			let startupFlags;
-			const startupFlagsOverride = Configuration.getStartupFlagsOverride();
-			if (typeof startupFlagsOverride === "string" && startupFlagsOverride.length > 0) {
-				startupFlags = startupFlagsOverride;
-			} else {
-				startupFlags = "--stdio";
-			}
-
-			serverOptions = {
-				command: languageServerPath,
-				args: startupFlags.split(/\s+/).filter(Boolean),
-			};
-		}
+		return { command: startCommandOverride, args: getStartupArgs() };
 	}
 
-	return serverOptions;
+	const languageServerPath = await checkAndInstall(context);
+	if (typeof languageServerPath === "undefined") {
+		return undefined;
+	}
+
+	return { command: languageServerPath, args: getStartupArgs() };
 }
