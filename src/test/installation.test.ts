@@ -1,14 +1,13 @@
-import { describe, it, before, after, beforeEach, afterEach } from "node:test";
+import { describe, it, before, beforeEach, afterEach } from "node:test";
 import assert from "node:assert";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
-import { http, HttpResponse } from "msw";
-import { setupServer } from "msw/node";
+import nock from "nock";
 import * as GithubFixture from "./fixtures/github-fixture";
 import type { Manifest } from "../installation";
 
-const server = setupServer();
+const GITHUB_API = "https://api.github.com";
 
 interface TestContext {
 	tempDir: string;
@@ -55,14 +54,12 @@ describe("checkAndInstall", () => {
 
 	before(async () => {
 		Installation = await import("../installation");
-		server.listen({ onUnhandledRequest: "error" });
+		nock.disableNetConnect();
 	});
-
-	after(() => server.close());
 
 	beforeEach(() => {
 		ctx = createTestContext();
-		server.resetHandlers();
+		nock.cleanAll();
 	});
 
 	afterEach(() => cleanupTestContext(ctx));
@@ -71,15 +68,13 @@ describe("checkAndInstall", () => {
 		const release = GithubFixture.any();
 		const fakeAsset = Buffer.from("fake-binary-content");
 
-		server.use(
-			http.get("https://api.github.com/repos/elixir-lang/expert/releases/tags/nightly", () =>
-				HttpResponse.json(release),
-			),
-			http.get(
-				"https://api.github.com/repos/elixir-lang/expert/releases/assets/:id",
-				() => new HttpResponse(fakeAsset),
-			),
-		);
+		nock(GITHUB_API)
+			.get("/repos/elixir-lang/expert/releases/tags/nightly")
+			.reply(200, release);
+
+		nock(GITHUB_API)
+			.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+			.reply(200, fakeAsset);
 
 		const result = await Installation.checkAndInstall(ctx.context as any);
 
@@ -116,15 +111,13 @@ describe("checkAndInstall", () => {
 		const newRelease = GithubFixture.nightlyRelease("2025-11-22T00:24:06Z");
 		const newAsset = Buffer.from("new-binary-content");
 
-		server.use(
-			http.get("https://api.github.com/repos/elixir-lang/expert/releases/tags/nightly", () =>
-				HttpResponse.json(newRelease),
-			),
-			http.get(
-				"https://api.github.com/repos/elixir-lang/expert/releases/assets/:id",
-				() => new HttpResponse(newAsset),
-			),
-		);
+		nock(GITHUB_API)
+			.get("/repos/elixir-lang/expert/releases/tags/nightly")
+			.reply(200, newRelease);
+
+		nock(GITHUB_API)
+			.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+			.reply(200, newAsset);
 
 		const result = await Installation.checkAndInstall(ctx.context as any);
 
@@ -151,15 +144,16 @@ describe("checkAndInstall", () => {
 
 		let assetDownloaded = false;
 
-		server.use(
-			http.get("https://api.github.com/repos/elixir-lang/expert/releases/tags/nightly", () =>
-				HttpResponse.json(GithubFixture.any()),
-			),
-			http.get("https://api.github.com/repos/elixir-lang/expert/releases/assets/:id", () => {
+		nock(GITHUB_API)
+			.get("/repos/elixir-lang/expert/releases/tags/nightly")
+			.reply(200, GithubFixture.any());
+
+		nock(GITHUB_API)
+			.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+			.reply(200, () => {
 				assetDownloaded = true;
-				return new HttpResponse(Buffer.from("should-not-download"));
-			}),
-		);
+				return Buffer.from("should-not-download");
+			});
 
 		const result = await Installation.checkAndInstall(ctx.context as any);
 
@@ -182,11 +176,9 @@ describe("checkAndInstall", () => {
 		};
 		ctx.globalStateStore.set("install_manifest", existingManifest);
 
-		server.use(
-			http.get("https://api.github.com/repos/elixir-lang/expert/releases/tags/nightly", () =>
-				HttpResponse.error(),
-			),
-		);
+		nock(GITHUB_API)
+			.get("/repos/elixir-lang/expert/releases/tags/nightly")
+			.replyWithError("network error");
 
 		const result = await Installation.checkAndInstall(ctx.context as any);
 
@@ -204,11 +196,9 @@ describe("checkAndInstall", () => {
 		// For now, we test with a release that has no matching assets
 		const release = GithubFixture.withPlatforms(["linux_amd64"]); // Only Linux, no darwin
 
-		server.use(
-			http.get("https://api.github.com/repos/elixir-lang/expert/releases/tags/nightly", () =>
-				HttpResponse.json(release),
-			),
-		);
+		nock(GITHUB_API)
+			.get("/repos/elixir-lang/expert/releases/tags/nightly")
+			.reply(200, release);
 
 		const result = await Installation.checkAndInstall(ctx.context as any);
 

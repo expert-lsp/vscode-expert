@@ -1,5 +1,5 @@
 {
-  "exclude": ["jest*.config.ts", "testSetup.ts", "__mocks__/*"],
+  "exclude": ["testSetup.ts", "__mocks__/*"],
   "compilerOptions": {
     "module": "commonjs",
     "target": "ES2020",
