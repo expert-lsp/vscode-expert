@@ -68,9 +68,7 @@ describe("checkAndInstall", () => {
 		const release = GithubFixture.any();
 		const fakeAsset = Buffer.from("fake-binary-content");
 
-		nock(GITHUB_API)
-			.get("/repos/elixir-lang/expert/releases/tags/nightly")
-			.reply(200, release);
+		nock(GITHUB_API).get("/repos/elixir-lang/expert/releases/tags/nightly").reply(200, release);
 
 		nock(GITHUB_API)
 			.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
@@ -111,9 +109,7 @@ describe("checkAndInstall", () => {
 		const newRelease = GithubFixture.nightlyRelease("2025-11-22T00:24:06Z");
 		const newAsset = Buffer.from("new-binary-content");
 
-		nock(GITHUB_API)
-			.get("/repos/elixir-lang/expert/releases/tags/nightly")
-			.reply(200, newRelease);
+		nock(GITHUB_API).get("/repos/elixir-lang/expert/releases/tags/nightly").reply(200, newRelease);
 
 		nock(GITHUB_API)
 			.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
@@ -196,9 +192,7 @@ describe("checkAndInstall", () => {
 		// For now, we test with a release that has no matching assets
 		const release = GithubFixture.withPlatforms(["linux_amd64"]); // Only Linux, no darwin
 
-		nock(GITHUB_API)
-			.get("/repos/elixir-lang/expert/releases/tags/nightly")
-			.reply(200, release);
+		nock(GITHUB_API).get("/repos/elixir-lang/expert/releases/tags/nightly").reply(200, release);
 
 		const result = await Installation.checkAndInstall(ctx.context as any);
 

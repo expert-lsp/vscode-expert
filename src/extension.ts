@@ -37,7 +37,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 			),
 		);
 	} else {
-		Logger.warn("language server startup options, will not start.")
+		Logger.warn("language server startup options, will not start.");
 	}
 }
 
