@@ -1,6 +1,5 @@
 import path = require("path");
-import { ConfigurationTarget, WorkspaceConfiguration, workspace as vsWorkspace } from "vscode";
-import { URI } from "vscode-uri";
+import { ConfigurationTarget, Uri, WorkspaceConfiguration, workspace as vsWorkspace } from "vscode";
 import * as Logger from "./logger";
 
 // wrapped in functions b/c getConfiguration needs to be called late
@@ -20,7 +19,7 @@ export function getStartupFlagsOverride() {
 	return getBaseConfig().get<string | undefined>("startupFlagsOverride", undefined);
 }
 
-export function getProjectDirUri(workspace: typeof vsWorkspace): URI {
+export function getProjectDirUri(workspace: typeof vsWorkspace): Uri {
 	const projectDirConfig = getBaseConfig().get<string>("projectDir");
 
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -28,10 +27,10 @@ export function getProjectDirUri(workspace: typeof vsWorkspace): URI {
 
 	if (typeof projectDirConfig === "string") {
 		const fullDirectoryPath = path.join(workspacePath, projectDirConfig);
-		return URI.file(fullDirectoryPath);
+		return Uri.file(fullDirectoryPath);
 	}
 
-	return URI.file(workspacePath);
+	return Uri.file(workspacePath);
 }
 
 export function disableAutoInstallUpdateNotification(): void {

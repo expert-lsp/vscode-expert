@@ -10,8 +10,47 @@ export const ConfigurationTarget = {
 	WorkspaceFolder: 3,
 };
 
+// URI implementation matching vscode.Uri API
+function createUri(scheme, authority, path, query, fragment) {
+	const fsPath = scheme === "file" ? path : "";
+	return {
+		scheme,
+		authority,
+		path,
+		query,
+		fragment,
+		fsPath,
+		toString: () => {
+			if (scheme === "file") {
+				return `file://${path}`;
+			}
+			let result = `${scheme}://`;
+			if (authority) result += authority;
+			result += path;
+			if (query) result += `?${query}`;
+			if (fragment) result += `#${fragment}`;
+			return result;
+		},
+	};
+}
+
 export const Uri = {
-	joinPath: (base, ...segments) => ({ fsPath: path.join(base.fsPath, ...segments) }),
+	file: (filePath) => createUri("file", "", filePath, "", ""),
+	parse: (value) => {
+		const url = new URL(value);
+		return createUri(
+			url.protocol.replace(":", ""),
+			url.host,
+			url.pathname,
+			url.search.replace("?", ""),
+			url.hash.replace("#", ""),
+		);
+	},
+	joinPath: (base, ...segments) => {
+		// Support both full Uri objects and simple { fsPath } objects from test contexts
+		const basePath = base.path ?? base.fsPath;
+		return createUri(base.scheme ?? "file", base.authority ?? "", path.join(basePath, ...segments), base.query ?? "", base.fragment ?? "");
+	},
 };
 
 export const window = {

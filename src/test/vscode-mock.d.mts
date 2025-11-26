@@ -1,8 +1,21 @@
 export const mockConfigValues: { values: Record<string, unknown> };
 export const mockUpdateCalls: { calls: Array<{ key: string; value: unknown; target: number }> };
 export const ConfigurationTarget: { Global: 1; Workspace: 2; WorkspaceFolder: 3 };
+
+interface MockUri {
+	scheme: string;
+	authority: string;
+	path: string;
+	query: string;
+	fragment: string;
+	fsPath: string;
+	toString: () => string;
+}
+
 export const Uri: {
-	joinPath: (base: { fsPath: string }, ...segments: string[]) => { fsPath: string };
+	file: (path: string) => MockUri;
+	parse: (value: string) => MockUri;
+	joinPath: (base: MockUri, ...segments: string[]) => MockUri;
 };
 export const window: {
 	showErrorMessage: () => Promise<undefined>;

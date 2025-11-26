@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import { ExtensionContext, Uri, commands, window, workspace } from "vscode";
 import { LanguageClient, LanguageClientOptions, ServerOptions } from "vscode-languageclient/node";
-import { URI } from "vscode-uri";
 import * as Commands from "./commands";
 import * as Configuration from "./configuration";
 import * as Logger from "./logger";
@@ -47,7 +46,7 @@ export const deactivate = () => {
 	// noop
 };
 
-async function start(serverOptions: ServerOptions, workspaceUri: URI): Promise<LanguageClient> {
+async function start(serverOptions: ServerOptions, workspaceUri: Uri): Promise<LanguageClient> {
 	Logger.info(`Starting Expert in directory ${workspaceUri?.fsPath}`);
 
 	const clientOptions: LanguageClientOptions = {

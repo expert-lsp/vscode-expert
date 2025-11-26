@@ -1,6 +1,6 @@
 import { describe, it, before, beforeEach } from "node:test";
 import assert from "node:assert";
-import { URI } from "vscode-uri";
+import { Uri } from "vscode";
 import { mockConfigValues, mockUpdateCalls } from "./vscode-mock.mjs";
 import * as WorkspaceFixture from "./fixtures/workspace-fixture";
 
@@ -85,20 +85,22 @@ describe("Configuration", () => {
 
 	describe("getProjectDirUri", () => {
 		it("returns the workspace URI when project dir is not configured", () => {
-			const workspace = WorkspaceFixture.withUri(URI.file("/stub"));
+			const workspace = WorkspaceFixture.withUri(Uri.file("/stub"));
 
 			const projectDirUri = Configuration.getProjectDirUri(workspace);
 
-			assert.deepStrictEqual(projectDirUri, workspace.workspaceFolders![0].uri);
+			assert.strictEqual(projectDirUri.fsPath, "/stub");
+			assert.strictEqual(projectDirUri.scheme, "file");
 		});
 
 		it("returns the full directory URI when project dir is configured", () => {
-			const workspace = WorkspaceFixture.withUri(URI.file("/stub"));
+			const workspace = WorkspaceFixture.withUri(Uri.file("/stub"));
 			mockConfigValues.values = { projectDir: "subdirectory" };
 
 			const projectDirUri = Configuration.getProjectDirUri(workspace);
 
-			assert.deepStrictEqual(projectDirUri, URI.file("/stub/subdirectory"));
+			assert.strictEqual(projectDirUri.fsPath, "/stub/subdirectory");
+			assert.strictEqual(projectDirUri.scheme, "file");
 		});
 	});
 });
