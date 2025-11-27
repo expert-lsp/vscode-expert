@@ -6,8 +6,8 @@ import * as Configuration from "./configuration";
 import { checkAndInstall } from "./installation";
 import * as Logger from "./logger";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+let client: LanguageClient | undefined;
+
 export async function activate(context: ExtensionContext): Promise<void> {
 	const serverEnabled = Configuration.getServerEnabled();
 
@@ -25,14 +25,12 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	const projectDir = Configuration.getProjectDirUri(workspace);
 
 	if (serverOptions !== undefined) {
-		const languageClient = await start(serverOptions, projectDir);
+		client = await start(serverOptions, projectDir);
 
 		context.subscriptions.push(
-			commands.registerCommand("expert.server.restart", () =>
-				Commands.restartServer(languageClient),
-			),
+			commands.registerCommand("expert.server.restart", () => Commands.restartServer(client!)),
 			commands.registerCommand("expert.server.reindexProject", () =>
-				Commands.reindexProject(languageClient),
+				Commands.reindexProject(client!),
 			),
 		);
 	} else {
@@ -40,11 +38,12 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	}
 }
 
-// This method is called when your extension is deactivated
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export const deactivate = () => {
-	// noop
-};
+export function deactivate() {
+	if (!client) {
+		return undefined;
+	}
+	return client.stop();
+}
 
 async function start(serverOptions: ServerOptions, workspaceUri: Uri): Promise<LanguageClient> {
 	Logger.info(`Starting Expert in directory ${workspaceUri?.fsPath}`);
