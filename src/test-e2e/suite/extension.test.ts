@@ -1,9 +1,9 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { Fixture, activate } from "../helpers";
+import { activate, Fixture } from "../helpers";
 
-suite("Extension E2E Tests", () => {
-	test("Should get diagnostics", async () => {
+describe("Extension E2E Tests", () => {
+	it("should get diagnostics", async () => {
 		const [doc] = await activate(Fixture.Diagnostics);
 		const actualDiagnostics = vscode.languages.getDiagnostics(doc.uri);
 

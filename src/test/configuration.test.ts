@@ -1,8 +1,8 @@
-import { describe, it, before, beforeEach } from "node:test";
 import assert from "node:assert";
+import { before, beforeEach, describe, it } from "node:test";
 import { Uri } from "vscode";
-import { mockConfigValues, mockUpdateCalls } from "./vscode-mock.mjs";
 import * as WorkspaceFixture from "./fixtures/workspace-fixture";
+import { mockConfigValues, mockUpdateCalls } from "./vscode-mock.mjs";
 
 type ConfigurationModule = typeof import("../configuration");
 

@@ -1,5 +1,5 @@
-import * as Logger from "./logger";
 import { Endpoints } from "@octokit/types";
+import * as Logger from "./logger";
 
 type Releases = Endpoints["GET /repos/{owner}/{repo}/releases"]["response"]["data"];
 

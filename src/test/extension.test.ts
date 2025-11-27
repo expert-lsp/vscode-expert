@@ -1,5 +1,8 @@
-import { describe, it, before, beforeEach, mock } from "node:test";
+// biome-ignore-all lint/suspicious/noEmptyBlockStatements: mocks void functions
+// biome-ignore-all lint/suspicious/noExplicitAny: mocks as any
+
 import assert from "node:assert";
+import { before, beforeEach, describe, it, mock } from "node:test";
 
 // Track calls to key functions
 let checkAndInstallCalled = false;

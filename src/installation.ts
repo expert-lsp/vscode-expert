@@ -1,9 +1,9 @@
-import * as os from "os";
 import * as fs from "fs";
+import * as os from "os";
 import { ExtensionContext, Uri, window } from "vscode";
-import { fetchNightlyRelease, GITHUB_HEADERS, Release as GitHubRelease, Asset } from "./github";
-import * as Logger from "./logger";
 import * as Configuration from "./configuration";
+import { Asset, fetchNightlyRelease, GITHUB_HEADERS, Release as GitHubRelease } from "./github";
+import * as Logger from "./logger";
 
 export type Platform =
 	| "aix"
@@ -54,10 +54,10 @@ export async function checkAndInstall(context: ExtensionContext): Promise<string
 	try {
 		return await compareAndInstall(context, manifest);
 	} catch (e) {
-		Logger.error("An unexpected error occurred checking for updates");
-
-		// TODO: Log the error here in some intelligible way that's not gonna just be [Object object]
-		// Logger.error(e)
+		const errorMessage = e instanceof Error ? e.message : String(e);
+		Logger.error("An unexpected error occurred checking for updates: {error}", {
+			error: errorMessage,
+		});
 
 		return Uri.joinPath(context.globalStorageUri, manifest.name).fsPath;
 	}

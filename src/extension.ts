@@ -1,10 +1,10 @@
 import * as fs from "fs";
-import { ExtensionContext, Uri, commands, window, workspace } from "vscode";
+import { commands, ExtensionContext, Uri, window, workspace } from "vscode";
 import { LanguageClient, LanguageClientOptions, ServerOptions } from "vscode-languageclient/node";
 import * as Commands from "./commands";
 import * as Configuration from "./configuration";
-import * as Logger from "./logger";
 import { checkAndInstall } from "./installation";
+import * as Logger from "./logger";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed

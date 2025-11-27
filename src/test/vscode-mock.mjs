@@ -1,3 +1,6 @@
+// biome-ignore-all lint/suspicious/noEmptyBlockStatements: mocks void functions
+// biome-ignore-all lint/suspicious/noExplicitAny: mocks as any
+
 // Mock vscode module for tests
 import path from "node:path";
 
@@ -49,7 +52,13 @@ export const Uri = {
 	joinPath: (base, ...segments) => {
 		// Support both full Uri objects and simple { fsPath } objects from test contexts
 		const basePath = base.path ?? base.fsPath;
-		return createUri(base.scheme ?? "file", base.authority ?? "", path.join(basePath, ...segments), base.query ?? "", base.fragment ?? "");
+		return createUri(
+			base.scheme ?? "file",
+			base.authority ?? "",
+			path.join(basePath, ...segments),
+			base.query ?? "",
+			base.fragment ?? "",
+		);
 	},
 };
 

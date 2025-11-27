@@ -1,11 +1,13 @@
-import { describe, it, before, beforeEach, afterEach } from "node:test";
+// biome-ignore-all lint/suspicious/noExplicitAny: mocks as any
+
 import assert from "node:assert";
 import * as fs from "node:fs";
-import * as path from "node:path";
 import * as os from "node:os";
+import * as path from "node:path";
+import { afterEach, before, beforeEach, describe, it } from "node:test";
 import nock from "nock";
-import * as GithubFixture from "./fixtures/github-fixture";
 import type { Manifest } from "../installation";
+import * as GithubFixture from "./fixtures/github-fixture";
 
 const GITHUB_API = "https://api.github.com";
 

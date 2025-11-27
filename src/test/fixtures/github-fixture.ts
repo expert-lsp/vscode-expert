@@ -188,7 +188,6 @@ export function nightlyRelease(updatedAt?: string): GitHubRelease {
  */
 export function withPlatforms(platforms: string[], updatedAt?: string): GitHubRelease {
 	const release = nightlyRelease(updatedAt);
-	const timestamp = updatedAt || "2025-11-22T00:24:06Z";
 
 	// Filter assets to only include specified platforms
 	release.assets = release.assets.filter((asset) => {

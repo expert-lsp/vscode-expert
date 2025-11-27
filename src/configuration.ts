@@ -1,5 +1,6 @@
 import path = require("path");
-import { ConfigurationTarget, Uri, WorkspaceConfiguration, workspace as vsWorkspace } from "vscode";
+
+import { ConfigurationTarget, Uri, workspace as vsWorkspace, WorkspaceConfiguration } from "vscode";
 import * as Logger from "./logger";
 
 // wrapped in functions b/c getConfiguration needs to be called late
