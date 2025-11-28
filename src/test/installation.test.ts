@@ -86,7 +86,8 @@ describe("checkAndInstall", () => {
 		assert.ok(fs.existsSync(result), "Distribution should exist on disk");
 		assert.deepStrictEqual(fs.readFileSync(result), fakeAsset);
 		if (process.platform !== "win32") {
-			fs.accessSync(result, fs.constants.X_OK);
+			const mode = fs.statSync(result).mode;
+			assert.ok(mode & 0o111, "File should have execute bits set");
 		}
 
 		// manifest persisted
@@ -126,7 +127,8 @@ describe("checkAndInstall", () => {
 		assert.ok(result);
 		assert.deepStrictEqual(fs.readFileSync(result), newAsset);
 		if (process.platform !== "win32") {
-			fs.accessSync(result, fs.constants.X_OK);
+			const mode = fs.statSync(result).mode;
+			assert.ok(mode & 0o111, "File should have execute bits set");
 		}
 
 		// manifest updated with new timestamps

@@ -33,8 +33,8 @@ async function main() {
 	);
 
 	// Forward termination signals to child
-	const cleanup = () => child.kill()
-	
+	const cleanup = () => child.kill();
+
 	process.on("SIGINT", cleanup);
 	process.on("SIGTERM", cleanup);
 

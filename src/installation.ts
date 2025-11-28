@@ -40,6 +40,11 @@ export interface Manifest {
 	release_timestamp: Date;
 }
 
+/**
+ *
+ * @param context Expert's extension context.
+ * @returns Installation path if available.
+ */
 export async function checkAndInstall(context: ExtensionContext): Promise<string | undefined> {
 	const manifest = context.globalState.get<Manifest>("install_manifest");
 
@@ -153,7 +158,8 @@ async function download(asset: Asset, context: ExtensionContext) {
 
 	const installPath = Uri.joinPath(context.globalStorageUri, asset.name);
 
-	fs.writeFileSync(installPath.fsPath, buf, { mode: 0o755 });
+	fs.writeFileSync(installPath.fsPath, buf);
+	fs.chmodSync(installPath.fsPath, 0o755);
 
 	return installPath.fsPath;
 }

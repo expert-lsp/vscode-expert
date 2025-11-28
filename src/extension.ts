@@ -8,6 +8,10 @@ import * as Logger from "./logger";
 
 let client: LanguageClient | undefined;
 
+/**
+ * Called by VSCode when starting the extension.
+ * @param context Extension Context provided by Visual Studio Code.
+ */
 export async function activate(context: ExtensionContext): Promise<void> {
 	const serverEnabled = Configuration.getServerEnabled();
 
@@ -38,6 +42,9 @@ export async function activate(context: ExtensionContext): Promise<void> {
 	}
 }
 
+/**
+ * Called by VSCode when closing or turning off the extension otherwise.
+ */
 export function deactivate() {
 	if (!client) {
 		return undefined;
@@ -46,7 +53,7 @@ export function deactivate() {
 }
 
 async function start(serverOptions: ServerOptions, workspaceUri: Uri): Promise<LanguageClient> {
-	Logger.info(`Starting Expert in workspace ${workspaceUri?.fsPath}`)
+	Logger.info(`Starting Expert in workspace ${workspaceUri?.fsPath}`);
 
 	const clientOptions: LanguageClientOptions = {
 		outputChannel: Logger.outputChannel(),
@@ -109,9 +116,9 @@ async function getServerStartupOptions(
 		return undefined;
 	}
 
-	const args = getStartupArgs()
+	const args = getStartupArgs();
 
-	Logger.info(`Expert Language Server:\n${languageServerPath} ${args.join(" ")}`)
+	Logger.info(`Expert Language Server:\n${languageServerPath} ${args.join(" ")}`);
 
 	return { command: languageServerPath, args: args };
 }
