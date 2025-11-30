@@ -34,15 +34,15 @@ describe("Configuration", () => {
 		});
 	});
 
-	describe("getStartCommandOverride", () => {
+	describe("getReleasePathOverride", () => {
 		it("returns undefined by default when not configured", () => {
-			assert.strictEqual(Configuration.getStartCommandOverride(), undefined);
+			assert.strictEqual(Configuration.getReleasePathOverride(), undefined);
 		});
 
 		it("returns the configured path", () => {
-			mockConfigValues.values = { startCommandOverride: "/path/to/custom/expert_distribution" };
+			mockConfigValues.values = { releasePathOverride: "/path/to/custom/expert_distribution" };
 			assert.strictEqual(
-				Configuration.getStartCommandOverride(),
+				Configuration.getReleasePathOverride(),
 				"/path/to/custom/expert_distribution",
 			);
 		});

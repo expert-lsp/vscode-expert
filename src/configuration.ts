@@ -12,8 +12,8 @@ export function getServerEnabled() {
 	return getBaseConfig().get<boolean>("enabled", true);
 }
 
-export function getStartCommandOverride() {
-	return getBaseConfig().get<string | undefined>("startCommandOverride", undefined);
+export function getReleasePathOverride() {
+	return getBaseConfig().get<string | undefined>("releasePathOverride", undefined);
 }
 
 export function getStartupFlagsOverride() {

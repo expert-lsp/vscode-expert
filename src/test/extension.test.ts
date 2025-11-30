@@ -61,7 +61,7 @@ describe("Extension activation with configuration", () => {
 		mock.module("../configuration", {
 			namedExports: {
 				getServerEnabled: () => configValues.enabled ?? true,
-				getStartCommandOverride: () => configValues.startCommandOverride,
+				getReleasePathOverride: () => configValues.releasePathOverride,
 				getStartupFlagsOverride: () => configValues.startupFlagsOverride,
 				getProjectDirUri: () => ({ path: "/test/workspace", fsPath: "/test/workspace" }),
 			},
@@ -91,11 +91,11 @@ describe("Extension activation with configuration", () => {
 		});
 	});
 
-	describe("when expert.server.startCommandOverride is set", () => {
+	describe("when expert.server.releasePathOverride is set", () => {
 		it("uses override path instead of auto-install", async () => {
 			configValues = {
 				enabled: true,
-				startCommandOverride: "/custom/server/path",
+				releasePathOverride: "/custom/server/path",
 			};
 
 			const { activate } = await import("../extension");
@@ -117,7 +117,7 @@ describe("Extension activation with configuration", () => {
 		it("passes custom flags to server options", async () => {
 			configValues = {
 				enabled: true,
-				startCommandOverride: "/server/path",
+				releasePathOverride: "/server/path",
 				startupFlagsOverride: "--debug --verbose",
 			};
 
@@ -136,7 +136,7 @@ describe("Extension activation with configuration", () => {
 		it("uses default --stdio flag", async () => {
 			configValues = {
 				enabled: true,
-				startCommandOverride: "/server/path",
+				releasePathOverride: "/server/path",
 			};
 
 			const { activate } = await import("../extension");

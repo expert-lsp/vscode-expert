@@ -74,6 +74,7 @@ async function start(serverOptions: ServerOptions, workspaceUri: Uri): Promise<L
 			{ language: "phoenix-heex", scheme: "file" },
 			{ language: "phoenix-heex", scheme: "untitled" },
 		],
+		progressOnInitialization: true,
 		workspaceFolder: {
 			index: 0,
 			uri: workspaceUri,
@@ -132,11 +133,11 @@ async function getServerStartupOptions(
 		};
 	}
 
-	const startCommandOverride = Configuration.getStartCommandOverride();
+	const releasePathOverride = Configuration.getReleasePathOverride();
 
-	if (typeof startCommandOverride === "string" && startCommandOverride.length > 0) {
-		Logger.info(`starting language server from release override: "${startCommandOverride}".`);
-		return { command: startCommandOverride, args };
+	if (typeof releasePathOverride === "string" && releasePathOverride.length > 0) {
+		Logger.info(`starting language server from release override: "${releasePathOverride}".`);
+		return { command: releasePathOverride, args };
 	}
 
 	const languageServerPath = await checkAndInstall(context);

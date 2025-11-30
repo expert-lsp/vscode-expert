@@ -150,10 +150,10 @@
           "default": true,
           "markdownDescription": "Enable or disable the Expert language server. When disabled, only syntax highlighting will be active. Requires extension reload to take effect."
         },
-        "expert.server.startCommandOverride": {
+        "expert.server.releasePathOverride": {
           "scope": "window",
           "type": "string",
-          "markdownDescription": "Custom start command for the language server. Use absolute paths, employ at your discretion."
+          "markdownDescription": "Custom release path for the language server binary. Use absolute paths, employ at your discretion."
         },
         "expert.server.startupFlagsOverride": {
           "scope": "window",
