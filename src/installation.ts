@@ -16,6 +16,7 @@ export type Platform =
 	| "windows";
 
 export type Architecture =
+	| "amd64" // == x64
 	| "arm"
 	| "arm64"
 	| "ia32"
@@ -129,10 +130,12 @@ async function compareAndInstall(
 }
 
 function findDistribution(release: GitHubRelease) {
-	const arch = os.arch() as Architecture;
+	let arch = os.arch() as Architecture;
 	let platform = os.platform() as Platform;
 
+	// swap in the aliases currently used by Expert's CI pipeline
 	platform = platform === "win32" ? "windows" : platform;
+	arch = arch === "x64" ? "amd64" : arch;
 
 	const asset = release.assets.find((asset) => asset.name.startsWith(`expert_${platform}_${arch}`));
 
