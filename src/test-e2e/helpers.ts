@@ -2,18 +2,30 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { type LanguageClient, State } from "vscode-languageclient/node";
 
+// Re-export State for use in tests
+export { State };
+export type { LanguageClient };
+
 export enum Fixture {
 	Diagnostics = "diagnostics",
 }
 
 /**
+ * Activates the Expert extension and returns the language client.
+ */
+export async function activateExtension(): Promise<LanguageClient | undefined> {
+	const ext = vscode.extensions.getExtension("expert-lsp.expert")!;
+	return (await ext.activate()) as LanguageClient | undefined;
+}
+
+/**
  * Waits for the language client to reach the Running state.
  */
-function waitForClientReady(client: LanguageClient, timeoutMs = 30000): Promise<void> {
+export function waitForClientReady(client: LanguageClient, timeoutMs = 30000): Promise<void> {
 	if (client.state === State.Running) {
 		return Promise.resolve();
 	}
-
+	
 	return new Promise((resolve, reject) => {
 		const timeout = setTimeout(() => {
 			disposable.dispose();
@@ -32,11 +44,11 @@ function waitForClientReady(client: LanguageClient, timeoutMs = 30000): Promise<
 
 /**
  * Waits for diagnostics to appear for a given URI.
- * @param uri The document URI to wait for diagnostics on
- * @param timeoutMs Maximum time to wait (default 30 seconds)
- * @returns Promise that resolves when diagnostics are available
  */
-function waitForDiagnostics(uri: vscode.Uri, timeoutMs = 15000): Promise<vscode.Diagnostic[]> {
+export function waitForDiagnostics(
+	uri: vscode.Uri,
+	timeoutMs = 15000,
+): Promise<vscode.Diagnostic[]> {
 	return new Promise((resolve, reject) => {
 		const timeout = setTimeout(() => {
 			disposable.dispose();
@@ -67,33 +79,9 @@ function waitForDiagnostics(uri: vscode.Uri, timeoutMs = 15000): Promise<vscode.
 }
 
 /**
- * Activates the Expert extension and waits for the language server to initialize.
+ * Returns the path to a fixture file.
  */
-export async function activate(
-	fixture: Fixture,
-): Promise<[vscode.TextDocument, vscode.TextEditor]> {
+export function getFixturePath(fixture: Fixture): string {
 	const fixturesProjectPath = path.resolve(__dirname, "./fixtures");
-
-	// The extensionId is `publisher.name` from package.json
-	const ext = vscode.extensions.getExtension("expert-lsp.expert")!;
-	const client = (await ext.activate()) as LanguageClient | undefined;
-
-	// Wait for server to initialize
-	if (client === undefined) {
-		throw new Error("Language client not available - server may have failed to start");
-	}
-	await waitForClientReady(client);
-
-	try {
-		const fixtureFilePath = path.resolve(fixturesProjectPath, "./lib/", `${fixture}.ex`);
-
-		const doc = await vscode.workspace.openTextDocument(fixtureFilePath);
-		const editor = await vscode.window.showTextDocument(doc);
-		await waitForDiagnostics(doc.uri);
-
-		return [doc, editor];
-	} catch (e) {
-		console.error(e);
-		throw e;
-	}
+	return path.resolve(fixturesProjectPath, "./lib/", `${fixture}.ex`);
 }
