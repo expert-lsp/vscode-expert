@@ -68,7 +68,7 @@ jobs:
 
       - run: |
           epmd -daemon
-          xvfb-run -a npm run test:e2e
+          xvfb-run -a npm run test:e2e:download
 
   check-format:
     runs-on: ubuntu-latest
