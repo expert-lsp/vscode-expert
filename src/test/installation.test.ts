@@ -82,7 +82,10 @@ describe("checkAndInstall", () => {
 
 		// install path returned
 		assert.ok(result, "Should return an install path");
-		assert.ok(result.endsWith(expectedAsset), `Expected path to end with ${expectedAsset}, got ${result}`);
+		assert.ok(
+			result.endsWith(expectedAsset),
+			`Expected path to end with ${expectedAsset}, got ${result}`,
+		);
 
 		// distribution saved and is executable
 		assert.ok(fs.existsSync(result), "Distribution should exist on disk");
@@ -171,7 +174,10 @@ describe("checkAndInstall", () => {
 
 		// returns existing path, file unchanged
 		assert.ok(result);
-		assert.ok(result.endsWith(expectedAsset), `Expected path to end with ${expectedAsset}, got ${result}`);
+		assert.ok(
+			result.endsWith(expectedAsset),
+			`Expected path to end with ${expectedAsset}, got ${result}`,
+		);
 		assert.deepStrictEqual(fs.readFileSync(result), existingAsset);
 		assert.strictEqual(assetDownloaded, false, "Asset should not have been downloaded");
 	});
@@ -197,7 +203,10 @@ describe("checkAndInstall", () => {
 
 		// graceful fallback to existing installation
 		assert.ok(result);
-		assert.ok(result.endsWith(expectedAsset), `Expected path to end with ${expectedAsset}, got ${result}`);
+		assert.ok(
+			result.endsWith(expectedAsset),
+			`Expected path to end with ${expectedAsset}, got ${result}`,
+		);
 		assert.ok(fs.existsSync(result));
 
 		// manifest unchanged
