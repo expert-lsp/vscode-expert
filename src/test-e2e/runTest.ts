@@ -34,7 +34,8 @@ async function main() {
 	}
 }
 
-function getPlatformArch(): { platform: string; arch: string } {
+// NOTE: duplicates logic from src/platform.ts b/c e2e tests have a separate rootDir.
+function getPlatformInfo(): { platform: string; arch: string } {
 	let platform = os.platform() as string;
 	let arch = os.arch() as string;
 	platform = platform === "win32" ? "windows" : platform;
@@ -42,7 +43,7 @@ function getPlatformArch(): { platform: string; arch: string } {
 	return { platform, arch };
 }
 
-const { platform, arch } = getPlatformArch();
+const { platform, arch } = getPlatformInfo();
 const CACHE_DIR = path.resolve(__dirname, `../../.vscode-test/expert_${platform}_${arch}`);
 
 function getExpertBinaryPath(): string {

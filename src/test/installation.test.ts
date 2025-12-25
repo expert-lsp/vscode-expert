@@ -7,6 +7,7 @@ import * as path from "node:path";
 import { afterEach, before, beforeEach, describe, it } from "node:test";
 import nock from "nock";
 import type { Manifest } from "../installation";
+import { getExpectedAssetName } from "../platform";
 import * as GithubFixture from "./fixtures/github-fixture";
 
 const GITHUB_API = "https://api.github.com";
@@ -67,6 +68,7 @@ describe("checkAndInstall", () => {
 	afterEach(() => cleanupTestContext(ctx));
 
 	it("installs the latest release when no prior version exists", async () => {
+		const expectedAsset = getExpectedAssetName();
 		const release = GithubFixture.any();
 		const fakeAsset = Buffer.from("fake-binary-content");
 
@@ -80,7 +82,7 @@ describe("checkAndInstall", () => {
 
 		// install path returned
 		assert.ok(result, "Should return an install path");
-		assert.match(result, /expert_darwin_arm64$/);
+		assert.ok(result.endsWith(expectedAsset), `Expected path to end with ${expectedAsset}, got ${result}`);
 
 		// distribution saved and is executable
 		assert.ok(fs.existsSync(result), "Distribution should exist on disk");
@@ -93,20 +95,22 @@ describe("checkAndInstall", () => {
 		// manifest persisted
 		const manifest = ctx.globalStateStore.get("install_manifest") as Manifest;
 		assert.ok(manifest, "Manifest should be saved");
-		assert.strictEqual(manifest.name, "expert_darwin_arm64");
+		assert.strictEqual(manifest.name, expectedAsset);
 		assert.strictEqual(manifest.version, "nightly");
 		assert.ok(manifest.asset_timestamp instanceof Date);
 		assert.ok(manifest.release_timestamp instanceof Date);
 	});
 
 	it("downloads a new release when one is available", async () => {
+		const expectedAsset = getExpectedAssetName();
+
 		// Pre-install an "older" version
 		const oldAsset = Buffer.from("old-binary");
-		fs.writeFileSync(path.join(ctx.tempDir, "expert_darwin_arm64"), oldAsset);
+		fs.writeFileSync(path.join(ctx.tempDir, expectedAsset), oldAsset);
 
 		const oldDate = new Date("2025-11-20T00:00:00Z");
 		ctx.globalStateStore.set("install_manifest", {
-			name: "expert_darwin_arm64",
+			name: expectedAsset,
 			version: "nightly",
 			asset_timestamp: oldDate,
 			release_timestamp: oldDate,
@@ -137,12 +141,14 @@ describe("checkAndInstall", () => {
 	});
 
 	it("skips download when local version is up-to-date", async () => {
+		const expectedAsset = getExpectedAssetName();
+
 		// Pre-install a "current" version with future timestamp
 		const existingAsset = Buffer.from("existing-binary");
-		fs.writeFileSync(path.join(ctx.tempDir, "expert_darwin_arm64"), existingAsset);
+		fs.writeFileSync(path.join(ctx.tempDir, expectedAsset), existingAsset);
 
 		ctx.globalStateStore.set("install_manifest", {
-			name: "expert_darwin_arm64",
+			name: expectedAsset,
 			version: "nightly",
 			asset_timestamp: new Date("2025-12-01T00:00:00Z"),
 			release_timestamp: new Date("2025-12-01T00:00:00Z"), // newer than fixture's 2025-11-22
@@ -165,17 +171,18 @@ describe("checkAndInstall", () => {
 
 		// returns existing path, file unchanged
 		assert.ok(result);
-		assert.match(result, /expert_darwin_arm64$/);
+		assert.ok(result.endsWith(expectedAsset), `Expected path to end with ${expectedAsset}, got ${result}`);
 		assert.deepStrictEqual(fs.readFileSync(result), existingAsset);
 		assert.strictEqual(assetDownloaded, false, "Asset should not have been downloaded");
 	});
 
 	it("falls back to existing installation when GitHub is unreachable", async () => {
+		const expectedAsset = getExpectedAssetName();
 		const existingAsset = Buffer.from("existing-binary");
-		fs.writeFileSync(path.join(ctx.tempDir, "expert_darwin_arm64"), existingAsset);
+		fs.writeFileSync(path.join(ctx.tempDir, expectedAsset), existingAsset);
 
 		const existingManifest = {
-			name: "expert_darwin_arm64",
+			name: expectedAsset,
 			version: "nightly",
 			asset_timestamp: new Date("2025-11-20T00:00:00Z"),
 			release_timestamp: new Date("2025-11-20T00:00:00Z"),
@@ -190,7 +197,7 @@ describe("checkAndInstall", () => {
 
 		// graceful fallback to existing installation
 		assert.ok(result);
-		assert.match(result, /expert_darwin_arm64$/);
+		assert.ok(result.endsWith(expectedAsset), `Expected path to end with ${expectedAsset}, got ${result}`);
 		assert.ok(fs.existsSync(result));
 
 		// manifest unchanged
@@ -198,15 +205,15 @@ describe("checkAndInstall", () => {
 	});
 
 	it("returns undefined and shows error when platform is unsupported", async () => {
-		// This test would require mocking os.arch/os.platform which is harder with Node test runner
-		// For now, we test with a release that has no matching assets
-		const release = GithubFixture.withPlatforms(["linux_amd64"]); // Only Linux, no darwin
+		// Create a release that excludes the current platform
+		// Use a fictional platform that won't match any real system
+		const release = GithubFixture.withPlatforms(["fictional_unsupported"]);
 
 		nock(GITHUB_API).get("/repos/elixir-lang/expert/releases/tags/nightly").reply(200, release);
 
 		const result = await Installation.checkAndInstall(ctx.context as any);
 
-		// no installation possible (darwin_arm64 not in release)
+		// no installation possible (current platform not in release)
 		assert.strictEqual(result, undefined);
 
 		// no manifest saved

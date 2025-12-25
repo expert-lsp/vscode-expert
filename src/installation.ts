@@ -1,34 +1,9 @@
 import * as fs from "fs";
-import * as os from "os";
 import { ExtensionContext, Uri, window } from "vscode";
 import * as Configuration from "./configuration";
 import { Asset, fetchNightlyRelease, GITHUB_HEADERS, Release as GitHubRelease } from "./github";
 import * as Logger from "./logger";
-
-export type Platform =
-	| "aix"
-	| "darwin"
-	| "freebsd"
-	| "linux"
-	| "openbsd"
-	| "sunos"
-	| "win32"
-	| "windows";
-
-export type Architecture =
-	| "amd64" // == x64
-	| "arm"
-	| "arm64"
-	| "ia32"
-	| "loong64"
-	| "mips"
-	| "mipsel"
-	| "ppc"
-	| "ppc64"
-	| "riscv64"
-	| "s390"
-	| "s390x"
-	| "x64";
+import { getPlatformInfo } from "./platform";
 
 /**
  * Metadata to persist between restarts of the extension. Used to track which distribution of
@@ -130,12 +105,7 @@ async function compareAndInstall(
 }
 
 function findDistribution(release: GitHubRelease) {
-	let arch = os.arch() as Architecture;
-	let platform = os.platform() as Platform;
-
-	// swap in the aliases currently used by Expert's CI pipeline
-	platform = platform === "win32" ? "windows" : platform;
-	arch = arch === "x64" ? "amd64" : arch;
+	const { platform, arch } = getPlatformInfo();
 
 	const asset = release.assets.find((asset) => asset.name.startsWith(`expert_${platform}_${arch}`));
 
