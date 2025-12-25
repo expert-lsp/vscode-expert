@@ -22,8 +22,7 @@ async function main() {
 		}
 
 		await runTests({
-			// Tests fail to run with a higher version. Requires further investigation.
-			version: "1.82.0",
+			version: "1.107.0",
 			extensionDevelopmentPath,
 			extensionTestsPath,
 			launchArgs: [fixturesProjectPath],
