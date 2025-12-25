@@ -22,7 +22,7 @@ export async function fetchNightlyRelease(): Promise<Release> {
 
 	const nightly = (await response.json()) as Release;
 
-	Logger.info(`Latest release is "${nightly.name}"`);
+	Logger.info(`Latest release is tagged "${nightly.tag_name}", published at ${nightly.published_at}`);
 
 	return nightly;
 }
