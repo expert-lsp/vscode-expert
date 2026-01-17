@@ -1,83 +1,40 @@
-name: Release vscode-expert
-
+name: Release
 on:
   push:
-    tags:
-      - v*
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  publish-vscode:
+  release:
+    name: release
     runs-on: ubuntu-latest
-    name: Build and publish vscode-expert to official VSCode marketplace
-    env:
-      VSCE_PAT: ${{ secrets.VSCE_PAT }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: googleapis/release-please-action@v4.1
+        id: release
 
-      - name: Setup Node
+      - name: Checkout
+        uses: actions/checkout@v3
+        if: ${{ steps.release.outputs.release_created }}
+
+
+      - name: Install Node.js
         uses: actions/setup-node@v4
+        if: ${{ steps.release.outputs.release_created }}
         with:
-          node-version: 22
-          cache: npm
+          node-version: 22.x
+      - run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
+      - name: publish to visual studio marketplace
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx vsce publish
 
-      - name: Publish extension
-        run: npm run vsce:publish
+      - name: publish to open vsx
+        if: ${{ steps.release.outputs.release_created }}
+        run: npx ovsx publish -p ${{ secrets.OPEN_VSX_PAT }}
 
-  publish-openvsx:
-    runs-on: ubuntu-latest
-    name: Build and publish vscode-expert to Open VSX marketplace
-    env:
-      OVSX_PAT: ${{ secrets.OVSX_PAT }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Publish extension
-        run: npm run ovsx:publish -- ${{ env.OVSX_PAT }}
-
-  github-release:
-    runs-on: ubuntu-latest
-    name: Create Github Release
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Package vscode-expert
-        run: npm run vsce:package -- --out vscode-expert.vsix
-
-      - run: cp vscode-expert.vsix vscode-expert-${{ github.ref_name }}.vsix
-
-      - name: Create Github Release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: vscode-expert*.vsix
-          makeLatest: true
-          allowUpdates: true
-          body: >
-            See the
-            [changelog](https://github.com/expert-lsp/vscode-expert/blob/main/CHANGELOG.md)
-            for the full release notes.
