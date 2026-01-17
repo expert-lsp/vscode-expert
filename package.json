@@ -4,7 +4,7 @@
   "description": "Elixir language support for Visual Studio Code",
   "version": "0.0.1",
   "repository": "github:expert-lsp/vscode-expert",
-  "publisher": "expert-lsp",
+  "publisher": "ExpertLSP",
   "license": "Apache-2.0",
   "engines": {
     "vscode": "^1.105.0"
