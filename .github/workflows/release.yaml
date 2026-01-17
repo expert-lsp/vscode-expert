@@ -25,18 +25,18 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         with:
           node-version: 22.x
-      - run: npm ci
+
+      - name: Build
+        run: npm ci
         if: ${{ steps.release.outputs.release_created }}
 
-      - name: publish to visual studio marketplace
+      - name: Publish to visual studio marketplace
         if: ${{ steps.release.outputs.release_created }}
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: npx vsce publish
 
-      # TODO: enable this once our namespace is claimed and PAT is created
-      # https://github.com/EclipseFdn/open-vsx.org/issues/7423
-      # - name: publish to open vsx
-      #   if: ${{ steps.release.outputs.release_created }}
-      #   run: npx ovsx publish -p ${{ secrets.OPEN_VSX_PAT }}
+      - name: Publish to open vsx
+        if: ${{ steps.release.outputs.release_created }}
+        run: npx ovsx publish -p ${{ secrets.OPEN_VSX_PAT }}
 
