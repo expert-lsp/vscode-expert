@@ -26,6 +26,7 @@ jobs:
         with:
           node-version: 22.x
       - run: npm ci
+        if: ${{ steps.release.outputs.release_created }}
 
       - name: publish to visual studio marketplace
         if: ${{ steps.release.outputs.release_created }}
