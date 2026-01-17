@@ -34,7 +34,9 @@ jobs:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: npx vsce publish
 
-      - name: publish to open vsx
-        if: ${{ steps.release.outputs.release_created }}
-        run: npx ovsx publish -p ${{ secrets.OPEN_VSX_PAT }}
+			# TODO: enable this once our namespace is claimed and PAT is created
+			# https://github.com/EclipseFdn/open-vsx.org/issues/7423
+      # - name: publish to open vsx
+      #   if: ${{ steps.release.outputs.release_created }}
+      #   run: npx ovsx publish -p ${{ secrets.OPEN_VSX_PAT }}
 
