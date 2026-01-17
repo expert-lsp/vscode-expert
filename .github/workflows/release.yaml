@@ -21,7 +21,7 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
 
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         if: ${{ steps.release.outputs.release_created }}
         with:
           node-version: 22.x
