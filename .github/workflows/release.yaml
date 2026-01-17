@@ -1,0 +1,42 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4.1
+        id: release
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        if: ${{ steps.release.outputs.release_created }}
+
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        if: ${{ steps.release.outputs.release_created }}
+        with:
+          node-version: 22.x
+      - run: npm ci
+
+      - name: publish to visual studio marketplace
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx vsce publish
+
+			# TODO: enable this once our namespace is claimed and PAT is created
+			# https://github.com/EclipseFdn/open-vsx.org/issues/7423
+      # - name: publish to open vsx
+      #   if: ${{ steps.release.outputs.release_created }}
+      #   run: npx ovsx publish -p ${{ secrets.OPEN_VSX_PAT }}
+
