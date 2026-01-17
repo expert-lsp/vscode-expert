@@ -17,7 +17,7 @@ jobs:
         id: release
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         if: ${{ steps.release.outputs.release_created }}
 
       - name: Install Node.js
