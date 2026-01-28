@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.1.1](https://github.com/expert-lsp/vscode-expert/compare/v0.1.0...v0.1.1) (2026-01-28)
+
+
+### Bug Fixes
+
+* line comment definition ([#11](https://github.com/expert-lsp/vscode-expert/issues/11)) ([6a5060f](https://github.com/expert-lsp/vscode-expert/commit/6a5060f49db4e5ac8e1dbe30000c8ac516905ec6))
+
 ## [0.1.0](https://github.com/expert-lsp/vscode-expert/compare/v0.0.1...v0.1.0) (2026-01-17)
 
 
