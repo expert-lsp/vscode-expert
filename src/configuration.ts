@@ -1,12 +1,12 @@
 import path = require("path");
 
-import { ConfigurationTarget, Uri, workspace as vsWorkspace, WorkspaceConfiguration } from "vscode";
+import { ConfigurationTarget, Uri, workspace as vsWorkspace } from "vscode";
 import * as Logger from "./logger";
 
 // wrapped in functions b/c getConfiguration needs to be called late
 const getBaseConfig = () => vsWorkspace.getConfiguration("expert.server");
 
-const getExpertConfig = () => getBaseConfig().getConfiguration("expert") as WorkspaceConfiguration;
+const getExpertConfig = () => vsWorkspace.getConfiguration("expert");
 
 export function getServerEnabled() {
 	return getBaseConfig().get<boolean>("enabled", true);
@@ -42,4 +42,8 @@ export function disableAutoInstallUpdateNotification(): void {
 
 export function getAutoInstallUpdateNotification() {
 	return getExpertConfig().get<boolean>("notifyOnServerAutoUpdate", true);
+}
+
+export function getNightly() {
+	return getBaseConfig().get<boolean>("nightly", false);
 }

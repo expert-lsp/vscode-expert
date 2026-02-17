@@ -165,6 +165,12 @@
           "type": "string",
           "markdownDescription": "A subdirectory of the current workspace in which to start Expert."
         },
+        "expert.server.nightly": {
+          "scope": "window",
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Install the nightly release of Expert instead of stable releases. Nightly builds contain the latest features but may be less stable."
+        },
         "expert.notifyOnServerAutoUpdate": {
           "scope": "window",
           "type": "boolean",
@@ -229,6 +235,7 @@
     "@octokit/types": "^16.0.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.19.1",
+    "@types/semver": "^7.7.1",
     "@types/vscode": "^1.105.0",
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.2.1",
@@ -241,6 +248,7 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "semver": "^7.7.4",
     "vscode-languageclient": "9.0.1"
   }
 }

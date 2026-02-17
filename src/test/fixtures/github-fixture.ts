@@ -189,10 +189,33 @@ export function nightlyRelease(updatedAt?: string): GitHubRelease {
 export function withPlatforms(platforms: string[], updatedAt?: string): GitHubRelease {
 	const release = nightlyRelease(updatedAt);
 
-	// Filter assets to only include specified platforms
 	release.assets = release.assets.filter((asset) => {
 		return platforms.some((platform) => asset.name.includes(platform));
 	});
 
 	return release;
+}
+
+export function stableRelease(version: string, updatedAt?: string): GitHubRelease {
+	const release = nightlyRelease(updatedAt);
+	release.tag_name = version;
+	release.prerelease = false;
+	return release;
+}
+
+export function releaseCandidate(rcNumber: number, updatedAt?: string): GitHubRelease {
+	const release = nightlyRelease(updatedAt);
+	release.tag_name = `0.1.0-rc.${rcNumber}`;
+	release.prerelease = true;
+	return release;
+}
+
+export function multipleReleases(): GitHubRelease[] {
+	return [
+		stableRelease("0.2.0", "2026-02-01T00:00:00Z"),
+		stableRelease("0.1.0", "2026-01-15T00:00:00Z"),
+		releaseCandidate(2, "2026-01-20T00:00:00Z"),
+		releaseCandidate(1, "2026-01-10T00:00:00Z"),
+		stableRelease("0.3.0", "2026-02-10T00:00:00Z"),
+	];
 }
