@@ -312,7 +312,8 @@ function parseChecksums(checksums: string): Map<string, string> {
 			continue;
 		}
 		const hash = parts[0];
-		const name = parts[parts.length - 1];
+		const rawName = parts[parts.length - 1];
+		const name = rawName.replace(/^\.\//, "");
 		map.set(name, hash);
 	}
 	return map;
