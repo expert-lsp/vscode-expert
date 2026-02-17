@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.2.0](https://github.com/expert-lsp/vscode-expert/compare/v0.1.1...v0.2.0) (2026-02-17)
+
+
+### Features
+
+* nightly option and automatically upgrade to rc or stable ([#16](https://github.com/expert-lsp/vscode-expert/issues/16)) ([e732fdb](https://github.com/expert-lsp/vscode-expert/commit/e732fdbbeb5995edab59560df27dd8af98aa81f7))
+
 ## [0.1.1](https://github.com/expert-lsp/vscode-expert/compare/v0.1.0...v0.1.1) (2026-01-28)
 
 
