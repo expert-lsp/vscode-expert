@@ -64,11 +64,11 @@ jobs:
           version-file: ".tool-versions"
           version-type: strict
 
-      - run: npm ci
+      - name: Install depdendencies
+        run: npm ci
 
-      - run: |
-          epmd -daemon
-          xvfb-run -a npm run test:e2e:download
+      - name: Run Tests
+        run: xvfb-run -a npm run test:e2e:download
 
   check-format:
     runs-on: ubuntu-latest
