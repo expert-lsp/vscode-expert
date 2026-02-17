@@ -47,6 +47,13 @@ Tells the extension to use a local release of the Expert language server instead
 
 Controls whether notifications are shown after automatic installs of new Expert versions. Defaults to `true`.
 
+### expert.server.nightly
+
+When set to `true`, the extension will install the latest nightly release of Expert instead of stable releases. Nightly builds contain the latest features but may be less stable. Defaults to `false`.
+
+> [!NOTE]
+> During the 0.1.0 release cycle, 0.1.0 release candidates are considered stable releases and will be installed when this setting is `false`.
+
 ### Editor Configuration
 
 The extension provides a language configuration for Elixir which marks `do`/`end` and `fn`/`end` as brackets. Among other things, this enables colorization of `do`/`end` and `fn`/`end` with VSCode's `editor.bracketPairColorization.enabled` setting. While this can be helpful when searching for a `do`'s corresponding `end`, some users may prefer to use the standard keyword coloring, while still highlighting parenthesis and other brackets. This can be achieved by adding the following to your VSCode configuration.
