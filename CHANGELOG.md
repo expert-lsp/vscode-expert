@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.2.1](https://github.com/expert-lsp/vscode-expert/compare/v0.2.0...v0.2.1) (2026-02-19)
+
+
+### Bug Fixes
+
+* ensure only the asset for the current platform is used ([#20](https://github.com/expert-lsp/vscode-expert/issues/20)) ([761cc57](https://github.com/expert-lsp/vscode-expert/commit/761cc5747ece0d747eb02a0101a070b9903d6341)), closes [#21](https://github.com/expert-lsp/vscode-expert/issues/21)
+
 ## [0.2.0](https://github.com/expert-lsp/vscode-expert/compare/v0.1.1...v0.2.0) (2026-02-17)
 
 
