@@ -199,6 +199,11 @@
         "command": "expert.server.reindex",
         "category": "Expert",
         "title": "Rebuild code search index"
+      },
+      {
+        "command": "expert.server.checkForUpdates",
+        "category": "Expert",
+        "title": "Check for updates"
       }
     ],
     "configurationDefaults": {

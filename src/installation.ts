@@ -11,7 +11,7 @@ import {
 	shouldAutoUpgradeFromRC,
 } from "./github";
 import * as Logger from "./logger";
-import { getPlatformInfo } from "./platform";
+import { getExpectedAssetName, getPlatformInfo } from "./platform";
 
 /**
  * Metadata to persist between restarts of the extension. Used to track which distribution of
@@ -29,7 +29,10 @@ export interface Manifest {
  * @param context Expert's extension context.
  * @returns Installation path if available.
  */
-export async function checkAndInstall(context: ExtensionContext): Promise<string | undefined> {
+export async function checkAndInstall(
+	context: ExtensionContext,
+	attemptCount: number = 0,
+): Promise<string | undefined> {
 	const nightly = Configuration.getNightly();
 	const manifest = context.globalState.get<Manifest>("install_manifest");
 
@@ -40,7 +43,14 @@ export async function checkAndInstall(context: ExtensionContext): Promise<string
 				: "Language server is not installed, fetching latest stable release from GitHub...",
 		);
 
-		return await mustInstallLatest(context, nightly);
+		try {
+			return await mustInstallLatest(context, nightly);
+		} catch (e) {
+			const errorMessage = e instanceof Error ? e.message : String(e);
+			Logger.error("Failed to fetch Expert release: {error}", { error: errorMessage });
+			showFetchFailedNotification(context, attemptCount);
+			return undefined;
+		}
 	}
 
 	try {
@@ -51,7 +61,15 @@ export async function checkAndInstall(context: ExtensionContext): Promise<string
 			error: errorMessage,
 		});
 
-		return Uri.joinPath(context.globalStorageUri, manifest.name).fsPath;
+		const expectedAssetName = getExpectedAssetName();
+		if (manifest.name.startsWith(expectedAssetName)) {
+			return Uri.joinPath(context.globalStorageUri, manifest.name).fsPath;
+		}
+
+		const { platform, arch } = getPlatformInfo();
+		const manifestPlatform = manifest.name.replace(/^expert_/, "").replace(/\.exe$/, "");
+		showFetchFailedNotification(context, attemptCount, manifestPlatform, `${platform}_${arch}`);
+		return undefined;
 	}
 }
 
@@ -226,7 +244,7 @@ async function compareAndInstallStable(
 	const needsUpdate =
 		currentVersion !== newVersion || shouldAutoUpgradeFromRC(currentVersion, newVersion);
 
-	if (!needsUpdate) {
+	if (!needsUpdate && manifest.name.startsWith(getExpectedAssetName())) {
 		Logger.info(`Using currently installed stable version (${currentVersion}), no download needed`);
 		const installPath = Uri.joinPath(context.globalStorageUri, manifest.name);
 		return installPath.fsPath;
@@ -322,6 +340,38 @@ function parseChecksums(checksums: string): Map<string, string> {
 function sha256File(filePath: string): string {
 	const fileBuffer = fs.readFileSync(filePath);
 	return createHash("sha256").update(fileBuffer).digest("hex");
+}
+
+export async function checkForUpdates(context: ExtensionContext): Promise<string | undefined> {
+	const result = await checkAndInstall(context);
+
+	if (result !== undefined) {
+		const manifest = context.globalState.get<Manifest>("install_manifest");
+		window.showInformationMessage(`Expert is up to date (${manifest?.version ?? "unknown"}).`);
+	}
+
+	return result;
+}
+
+function showFetchFailedNotification(
+	context: ExtensionContext,
+	attemptCount: number,
+	manifestPlatform?: string,
+	currentPlatform?: string,
+) {
+	const attempt = attemptCount > 0 ? ` (Attempt #${attemptCount + 1})` : "";
+
+	const message =
+		manifestPlatform && currentPlatform
+			? `Current Expert binary is for ${manifestPlatform} but you're on ${currentPlatform}. Failed to download correct version${attempt}.`
+			: `Failed to fetch Expert release${attempt}.`;
+
+	const retry = "Retry";
+	window.showErrorMessage(message, retry).then((selected) => {
+		if (selected === retry) {
+			checkAndInstall(context, attemptCount + 1);
+		}
+	});
 }
 
 function notifyAutoInstallSuccess(version: string) {
