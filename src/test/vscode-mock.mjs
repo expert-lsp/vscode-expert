@@ -63,8 +63,14 @@ export const Uri = {
 };
 
 export const window = {
-	showErrorMessage: () => Promise.resolve(undefined),
-	showInformationMessage: () => Promise.resolve(undefined),
+	showErrorMessage: (...args) => {
+		mockWindowMessages.errors.push(args);
+		return Promise.resolve(undefined);
+	},
+	showInformationMessage: (...args) => {
+		mockWindowMessages.info.push(args);
+		return Promise.resolve(undefined);
+	},
 	createOutputChannel: () => ({
 		append: () => {},
 		appendLine: () => {},
@@ -90,6 +96,9 @@ export const commands = {
 
 // Track update calls for assertions
 export const mockUpdateCalls = { calls: [] };
+
+// Track window message calls for assertions
+export const mockWindowMessages = { errors: [], info: [] };
 
 export const workspace = {
 	getConfiguration: () => {

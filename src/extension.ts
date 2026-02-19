@@ -8,7 +8,7 @@ import {
 } from "vscode-languageclient/node";
 import * as Commands from "./commands";
 import * as Configuration from "./configuration";
-import { checkAndInstall } from "./installation";
+import { checkAndInstall, checkForUpdates } from "./installation";
 import * as Logger from "./logger";
 
 let client: LanguageClient | undefined;
@@ -28,6 +28,10 @@ export async function activate(context: ExtensionContext): Promise<LanguageClien
 	}
 
 	ensureDirectoryExists(context.globalStorageUri);
+
+	context.subscriptions.push(
+		commands.registerCommand("expert.server.checkForUpdates", () => checkForUpdates(context)),
+	);
 
 	const serverOptions = await getServerStartupOptions(context);
 	const projectDir = Configuration.getProjectDirUri(workspace);

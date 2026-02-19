@@ -8,9 +8,9 @@ import * as path from "node:path";
 import { afterEach, before, beforeEach, describe, it } from "node:test";
 import nock from "nock";
 import type { Manifest } from "../installation";
-import { getExpectedAssetName } from "../platform";
+import { getExpectedAssetName, getPlatformInfo } from "../platform";
 import * as GithubFixture from "./fixtures/github-fixture";
-import { mockConfigValues } from "./vscode-mock.mjs";
+import { mockConfigValues, mockWindowMessages } from "./vscode-mock.mjs";
 
 const GITHUB_API = "https://api.github.com";
 const CHECKSUMS_ASSET_ID = 319436622;
@@ -18,6 +18,11 @@ const CHECKSUMS_ASSET_ID = 319436622;
 function checksumsContent(assetName: string, data: Buffer) {
 	const hash = createHash("sha256").update(data).digest("hex");
 	return `${hash}  ${assetName}\n`;
+}
+
+function getWrongPlatformAssetName(): string {
+	const expected = getExpectedAssetName();
+	return expected.includes("linux") ? "expert_darwin_arm64" : "expert_linux_amd64";
 }
 
 interface TestContext {
@@ -423,6 +428,82 @@ describe("checkAndInstall", () => {
 
 			assert.strictEqual(result, undefined);
 			assert.strictEqual(ctx.globalStateStore.get("install_manifest"), undefined);
+		});
+
+		it("shows notification when no manifest and GitHub is unreachable", async () => {
+			mockConfigValues.values["nightly"] = true;
+			mockWindowMessages.errors.length = 0;
+
+			nock(GITHUB_API)
+				.get("/repos/elixir-lang/expert/releases/tags/nightly")
+				.replyWithError("network error");
+
+			const result = await Installation.checkAndInstall(ctx.context as any);
+
+			assert.strictEqual(result, undefined);
+			assert.strictEqual(mockWindowMessages.errors.length, 1);
+			assert.strictEqual(mockWindowMessages.errors[0][0], "Failed to fetch Expert release.");
+			assert.strictEqual(mockWindowMessages.errors[0][1], "Retry");
+		});
+
+		it("shows platform mismatch notification when manifest has wrong platform and GitHub is unreachable", async () => {
+			mockConfigValues.values["nightly"] = true;
+			mockWindowMessages.errors.length = 0;
+
+			const wrongAsset = getWrongPlatformAssetName();
+			ctx.globalStateStore.set("install_manifest", {
+				name: wrongAsset,
+				version: "nightly",
+				asset_timestamp: new Date("2025-11-20T00:00:00Z"),
+				release_timestamp: new Date("2025-11-20T00:00:00Z"),
+			});
+
+			nock(GITHUB_API)
+				.get("/repos/elixir-lang/expert/releases/tags/nightly")
+				.replyWithError("network error");
+
+			const result = await Installation.checkAndInstall(ctx.context as any);
+
+			const { platform, arch } = getPlatformInfo();
+			const manifestPlatform = wrongAsset.replace(/^expert_/, "");
+
+			assert.strictEqual(result, undefined);
+			assert.strictEqual(mockWindowMessages.errors.length, 1);
+			assert.strictEqual(
+				mockWindowMessages.errors[0][0],
+				`Current Expert binary is for ${manifestPlatform} but you're on ${platform}_${arch}. Failed to download correct version.`,
+			);
+			assert.strictEqual(mockWindowMessages.errors[0][1], "Retry");
+		});
+
+		it("re-downloads correct binary when manifest has wrong platform and GitHub is reachable", async () => {
+			mockConfigValues.values["nightly"] = false;
+
+			const wrongAsset = getWrongPlatformAssetName();
+			const expectedAsset = getExpectedAssetName();
+			ctx.globalStateStore.set("install_manifest", {
+				name: wrongAsset,
+				version: "0.3.0",
+				asset_timestamp: new Date("2025-12-10T00:00:00Z"),
+				release_timestamp: new Date("2025-12-10T00:00:00Z"),
+			});
+
+			const releases = GithubFixture.multipleReleases();
+			const newAsset = Buffer.from("correct-platform-binary");
+
+			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases").reply(200, releases);
+			nock(GITHUB_API)
+				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.reply(200, newAsset);
+
+			const result = await Installation.checkAndInstall(ctx.context as any);
+
+			assert.ok(result);
+			assert.strictEqual(path.basename(result), expectedAsset);
+			assert.deepStrictEqual(fs.readFileSync(result), newAsset);
+
+			const manifest = ctx.globalStateStore.get("install_manifest") as Manifest;
+			assert.strictEqual(manifest.name, expectedAsset);
 		});
 	});
 });
