@@ -204,6 +204,18 @@
         "command": "expert.server.checkForUpdates",
         "category": "Expert",
         "title": "Check for updates"
+      },
+      {
+        "command": "expert.github.login",
+        "category": "Expert",
+        "title": "Sign in with GitHub",
+        "icon": "$(github)"
+      },
+      {
+        "command": "expert.github.logout",
+        "category": "Expert",
+        "title": "Sign out from GitHub",
+        "icon": "$(sign-out)"
       }
     ],
     "configurationDefaults": {

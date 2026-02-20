@@ -51,10 +51,18 @@ export const GITHUB_HEADERS = {
 	"X-GitHub-Api-Version": "2022-11-28",
 };
 
-export async function fetchNightlyRelease(): Promise<Release> {
+function getHeaders(authToken?: string): Record<string, string> {
+	const headers: Record<string, string> = { ...GITHUB_HEADERS };
+	if (authToken) {
+		headers.Authorization = `Bearer ${authToken}`;
+	}
+	return headers;
+}
+
+export async function fetchNightlyRelease(authToken?: string): Promise<Release> {
 	const url = "https://api.github.com/repos/elixir-lang/expert/releases/tags/nightly";
 
-	const response: Response = await fetch(url, { headers: GITHUB_HEADERS }).catch((e) => {
+	const response: Response = await fetch(url, { headers: getHeaders(authToken) }).catch((e) => {
 		const errorMessage = e instanceof Error ? e.message : String(e);
 		Logger.error(`Failed to connect to GitHub API at ${url}: ${errorMessage}`);
 		throw new Error(`Failed to connect to GitHub API: ${errorMessage}`);
@@ -80,10 +88,10 @@ export async function fetchNightlyRelease(): Promise<Release> {
 	return nightly;
 }
 
-export async function releases(): Promise<Releases> {
+export async function releases(authToken?: string): Promise<Releases> {
 	const url = "https://api.github.com/repos/elixir-lang/expert/releases";
 
-	const response: Response = await fetch(url, { headers: GITHUB_HEADERS }).catch((e) => {
+	const response: Response = await fetch(url, { headers: getHeaders(authToken) }).catch((e) => {
 		const errorMessage = e instanceof Error ? e.message : String(e);
 		Logger.error(`Failed to connect to GitHub API at ${url}: ${errorMessage}`);
 		throw new Error(`Failed to connect to GitHub API: ${errorMessage}`);
@@ -103,8 +111,8 @@ export async function releases(): Promise<Releases> {
 	return (await response.json()) as Releases;
 }
 
-export async function fetchStableRelease(): Promise<Release | null> {
-	const allReleases = await releases();
+export async function fetchStableRelease(authToken?: string): Promise<Release | null> {
+	const allReleases = await releases(authToken);
 
 	const stableReleases = allReleases.filter((release) => {
 		if (release.draft) {
