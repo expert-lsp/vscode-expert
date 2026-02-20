@@ -52,10 +52,24 @@ export const GITHUB_HEADERS = {
 };
 
 export async function fetchNightlyRelease(): Promise<Release> {
-	const response = await fetch(
-		"https://api.github.com/repos/elixir-lang/expert/releases/tags/nightly",
-		{ headers: GITHUB_HEADERS },
-	);
+	const url = "https://api.github.com/repos/elixir-lang/expert/releases/tags/nightly";
+
+	const response: Response = await fetch(url, { headers: GITHUB_HEADERS }).catch((e) => {
+		const errorMessage = e instanceof Error ? e.message : String(e);
+		Logger.error(`Failed to connect to GitHub API at ${url}: ${errorMessage}`);
+		throw new Error(`Failed to connect to GitHub API: ${errorMessage}`);
+	});
+
+	if (!response.ok) {
+		const status = response.status;
+		const statusText = response.statusText;
+		const errorBody = await response.text();
+		Logger.error(
+			`GitHub API returned error status for nightly release: ${status} ${statusText} (URL: ${url})`,
+		);
+		Logger.error(`GitHub API error response body: ${errorBody}`);
+		throw new Error(`GitHub API error: ${status} ${statusText} - ${url}`);
+	}
 
 	const nightly = (await response.json()) as Release;
 
@@ -67,9 +81,24 @@ export async function fetchNightlyRelease(): Promise<Release> {
 }
 
 export async function releases(): Promise<Releases> {
-	const response = await fetch("https://api.github.com/repos/elixir-lang/expert/releases", {
-		headers: GITHUB_HEADERS,
+	const url = "https://api.github.com/repos/elixir-lang/expert/releases";
+
+	const response: Response = await fetch(url, { headers: GITHUB_HEADERS }).catch((e) => {
+		const errorMessage = e instanceof Error ? e.message : String(e);
+		Logger.error(`Failed to connect to GitHub API at ${url}: ${errorMessage}`);
+		throw new Error(`Failed to connect to GitHub API: ${errorMessage}`);
 	});
+
+	if (!response.ok) {
+		const status = response.status;
+		const statusText = response.statusText;
+		const errorBody = await response.text();
+		Logger.error(
+			`GitHub API returned error status for releases list: ${status} ${statusText} (URL: ${url})`,
+		);
+		Logger.error(`GitHub API error response body: ${errorBody}`);
+		throw new Error(`GitHub API error: ${status} ${statusText} - ${url}`);
+	}
 
 	return (await response.json()) as Releases;
 }

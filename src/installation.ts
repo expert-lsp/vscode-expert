@@ -290,12 +290,30 @@ function findDistribution(release: GitHubRelease) {
 }
 
 async function download(asset: Asset, context: ExtensionContext) {
-	const res = await fetch(asset.url, {
+	const res: Response = await fetch(asset.url, {
 		headers: {
 			...GITHUB_HEADERS,
 			Accept: "application/octet-stream",
 		},
+	}).catch((e) => {
+		const errorMessage = e instanceof Error ? e.message : String(e);
+		Logger.error(
+			`Failed to connect to GitHub to download ${asset.name} from ${asset.url}: ${errorMessage}`,
+		);
+		throw new Error(`Failed to download ${asset.name}: ${errorMessage}`);
 	});
+
+	if (!res.ok) {
+		const status = res.status;
+		const statusText = res.statusText;
+		const errorBody = await res.text();
+		Logger.error(
+			`GitHub returned error status when downloading ${asset.name}: ${status} ${statusText} (URL: ${asset.url})`,
+		);
+		Logger.error(`GitHub download error response body: ${errorBody}`);
+		throw new Error(`Download failed for ${asset.name}: ${status} ${statusText}`);
+	}
+
 	const buf = Buffer.from(await res.arrayBuffer());
 
 	const installPath = Uri.joinPath(context.globalStorageUri, asset.name);
@@ -307,12 +325,29 @@ async function download(asset: Asset, context: ExtensionContext) {
 }
 
 async function fetchChecksumsText(asset: Asset): Promise<string> {
-	const res = await fetch(asset.url, {
+	const res: Response = await fetch(asset.url, {
 		headers: {
 			...GITHUB_HEADERS,
 			Accept: "application/octet-stream",
 		},
+	}).catch((e) => {
+		const errorMessage = e instanceof Error ? e.message : String(e);
+		Logger.error(
+			`Failed to connect to GitHub to download checksums ${asset.name} from ${asset.url}: ${errorMessage}`,
+		);
+		throw new Error(`Failed to download checksums: ${errorMessage}`);
 	});
+
+	if (!res.ok) {
+		const status = res.status;
+		const statusText = res.statusText;
+		const errorBody = await res.text();
+		Logger.error(
+			`GitHub returned error status when downloading checksums ${asset.name}: ${status} ${statusText} (URL: ${asset.url})`,
+		);
+		Logger.error(`GitHub download error response body: ${errorBody}`);
+		throw new Error(`Download failed for checksums: ${status} ${statusText}`);
+	}
 
 	return await res.text();
 }
