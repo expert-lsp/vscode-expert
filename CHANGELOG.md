@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.2.2](https://github.com/expert-lsp/vscode-expert/compare/v0.2.1...v0.2.2) (2026-02-20)
+
+
+### Bug Fixes
+
+* add logs for request errors ([#23](https://github.com/expert-lsp/vscode-expert/issues/23)) ([68606dc](https://github.com/expert-lsp/vscode-expert/commit/68606dc68c7394a34b1dbf3c03b54c67f9eacfc4))
+
 ## [0.2.1](https://github.com/expert-lsp/vscode-expert/compare/v0.2.0...v0.2.1) (2026-02-19)
 
 

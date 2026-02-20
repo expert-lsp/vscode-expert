@@ -2,7 +2,7 @@
   "name": "expert",
   "displayName": "Expert LSP",
   "description": "Elixir language support for Visual Studio Code",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "repository": "github:expert-lsp/vscode-expert",
   "publisher": "ExpertLSP",
   "license": "Apache-2.0",
