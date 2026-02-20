@@ -88,6 +88,11 @@ Additionally, the Expert channel in VSCode's Output tab may contain some pertine
 
 The syntax highlighting grammar for HEEx (`~H` sigils and `*.heex` files) is maintained and provided by the [Phoenix Framework extension](https://marketplace.visualstudio.com/items?itemName=phoenixframework.phoenix). While HEEx is quite similar to EEx, it isn't part of Elixir's standard library.
 
+#### I'm getting rate limited by GitHub when the extension tries to download Expert releases
+
+If you are hitting Github's rate limits for unauthenticated users when the extension tries to download Expert releases, you can log in with Github.
+Open the command palette (`Command + Shift + P`), search for "Expert: Sign in with GitHub", and follow the instructions.
+
 ### Support
 
 If you have questions or need help, please refer to one of the following channels:
