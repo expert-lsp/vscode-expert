@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.3.0](https://github.com/expert-lsp/vscode-expert/compare/v0.2.2...v0.3.0) (2026-02-20)
+
+
+### Features
+
+* allow github authentication ([#25](https://github.com/expert-lsp/vscode-expert/issues/25)) ([c89ff3a](https://github.com/expert-lsp/vscode-expert/commit/c89ff3a8787ff84639923cf119e3eeafb75ce4de))
+
 ## [0.2.2](https://github.com/expert-lsp/vscode-expert/compare/v0.2.1...v0.2.2) (2026-02-20)
 
 
