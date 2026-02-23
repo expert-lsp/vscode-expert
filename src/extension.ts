@@ -9,17 +9,27 @@ import {
 import * as Auth from "./auth";
 import * as Commands from "./commands";
 import * as Configuration from "./configuration";
-import { checkAndInstall, checkForUpdates } from "./installation";
+import * as Engine from "./engine";
+import { checkAndInstall, checkForUpdates, Manifest } from "./installation";
 import * as Logger from "./logger";
 
 let client: LanguageClient | undefined;
+let extensionContext: ExtensionContext | undefined;
 
 /**
  * Called by VSCode when starting the extension.
  * @param context Extension Context provided by Visual Studio Code.
  */
 export async function activate(context: ExtensionContext): Promise<LanguageClient | undefined> {
+	extensionContext = context;
 	const serverEnabled = Configuration.getServerEnabled();
+
+	ensureDirectoryExists(context.globalStorageUri);
+
+	context.subscriptions.push(
+		commands.registerCommand("expert.engine.list", Engine.listEngines),
+		commands.registerCommand("expert.engine.clean", Engine.cleanEngines),
+	);
 
 	if (serverEnabled === false) {
 		Logger.info(
@@ -27,8 +37,6 @@ export async function activate(context: ExtensionContext): Promise<LanguageClien
 		);
 		return undefined;
 	}
-
-	ensureDirectoryExists(context.globalStorageUri);
 
 	await Auth.initialize();
 
@@ -149,6 +157,7 @@ async function getServerStartupOptions(
 
 	if (typeof releasePathOverride === "string" && releasePathOverride.length > 0) {
 		Logger.info(`starting language server from release override: "${releasePathOverride}".`);
+		setExpertBinaryPath(releasePathOverride);
 		return { command: releasePathOverride, args };
 	}
 
@@ -157,7 +166,42 @@ async function getServerStartupOptions(
 		return undefined;
 	}
 
+	setExpertBinaryPath(languageServerPath);
+
 	Logger.info(`Expert Language Server:\n${languageServerPath} ${args.join(" ")}`);
 
 	return { command: languageServerPath, args };
+}
+
+let cachedExpertBinaryPath: string | null | undefined = undefined;
+
+export async function getExpertBinaryPath(): Promise<string | undefined> {
+	if (cachedExpertBinaryPath !== undefined) {
+		return cachedExpertBinaryPath ?? undefined;
+	}
+
+	const releasePathOverride = Configuration.getReleasePathOverride();
+
+	if (typeof releasePathOverride === "string" && releasePathOverride.length > 0) {
+		cachedExpertBinaryPath = releasePathOverride;
+		return releasePathOverride;
+	}
+
+	if (extensionContext) {
+		const manifest = extensionContext.globalState.get<Manifest>("install_manifest");
+		if (manifest) {
+			const installPath = Uri.joinPath(extensionContext.globalStorageUri, manifest.name);
+			if (fs.existsSync(installPath.fsPath)) {
+				cachedExpertBinaryPath = installPath.fsPath;
+				return installPath.fsPath;
+			}
+		}
+	}
+
+	cachedExpertBinaryPath = null;
+	return undefined;
+}
+
+export function setExpertBinaryPath(path: string | undefined): void {
+	cachedExpertBinaryPath = path ?? null;
 }
