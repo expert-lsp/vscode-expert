@@ -208,14 +208,22 @@
       {
         "command": "expert.github.login",
         "category": "Expert",
-        "title": "Sign in with GitHub",
-        "icon": "$(github)"
+        "title": "Sign in with GitHub"
       },
       {
         "command": "expert.github.logout",
         "category": "Expert",
-        "title": "Sign out from GitHub",
-        "icon": "$(sign-out)"
+        "title": "Sign out from GitHub"
+      },
+      {
+        "command": "expert.engine.list",
+        "category": "Expert",
+        "title": "List engine builds"
+      },
+      {
+        "command": "expert.engine.clean",
+        "category": "Expert",
+        "title": "Clean engine builds"
       }
     ],
     "configurationDefaults": {
