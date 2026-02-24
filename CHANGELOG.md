@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.3.1](https://github.com/expert-lsp/vscode-expert/compare/v0.3.0...v0.3.1) (2026-02-24)
+
+
+### Bug Fixes
+
+* use platform-specific install manifest ([#30](https://github.com/expert-lsp/vscode-expert/issues/30)) ([c99969b](https://github.com/expert-lsp/vscode-expert/commit/c99969bd22ac514915461e1d8804f7b079c66806))
+
 ## [0.3.0](https://github.com/expert-lsp/vscode-expert/compare/v0.2.2...v0.3.0) (2026-02-20)
 
 
