@@ -86,10 +86,7 @@ export async function checkAndInstall(
 	}
 }
 
-function manifestAssetPath(
-	context: ExtensionContext,
-	manifest: Manifest
-): string {
+function manifestAssetPath(context: ExtensionContext, manifest: Manifest): string {
 	return Uri.joinPath(context.globalStorageUri, manifest.name).fsPath;
 }
 
@@ -408,10 +405,7 @@ export async function checkForUpdates(context: ExtensionContext): Promise<string
 	return result;
 }
 
-function showFetchFailedNotification(
-	context: ExtensionContext,
-	attemptCount: number,
-) {
+function showFetchFailedNotification(context: ExtensionContext, attemptCount: number) {
 	const attempt = attemptCount > 0 ? ` (Attempt #${attemptCount + 1})` : "";
 
 	const message = `Failed to fetch Expert release${attempt}.`;

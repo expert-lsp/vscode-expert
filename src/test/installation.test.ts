@@ -7,8 +7,8 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { afterEach, before, beforeEach, describe, it } from "node:test";
 import nock from "nock";
-import { type Manifest, getManifestKey } from "../installation";
-import { getExpectedAssetName, getPlatformInfo } from "../platform";
+import { getManifestKey, type Manifest } from "../installation";
+import { getExpectedAssetName } from "../platform";
 import * as GithubFixture from "./fixtures/github-fixture";
 import { mockConfigValues, mockWindowMessages } from "./vscode-mock.mjs";
 
