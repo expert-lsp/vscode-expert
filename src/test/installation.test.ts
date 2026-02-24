@@ -7,22 +7,18 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { afterEach, before, beforeEach, describe, it } from "node:test";
 import nock from "nock";
-import type { Manifest } from "../installation";
-import { getExpectedAssetName, getPlatformInfo } from "../platform";
+import { getManifestKey, type Manifest } from "../installation";
+import { getExpectedAssetName } from "../platform";
 import * as GithubFixture from "./fixtures/github-fixture";
 import { mockConfigValues, mockWindowMessages } from "./vscode-mock.mjs";
 
 const GITHUB_API = "https://api.github.com";
 const CHECKSUMS_ASSET_ID = 319436622;
+const MANIFEST_KEY = getManifestKey();
 
 function checksumsContent(assetName: string, data: Buffer) {
 	const hash = createHash("sha256").update(data).digest("hex");
 	return `${hash}  ${assetName}\n`;
-}
-
-function getWrongPlatformAssetName(): string {
-	const expected = getExpectedAssetName();
-	return expected.includes("linux") ? "expert_darwin_arm64" : "expert_linux_amd64";
 }
 
 interface TestContext {
@@ -110,7 +106,7 @@ describe("checkAndInstall", () => {
 				assert.ok(mode & 0o111, "File should have execute bits set");
 			}
 
-			const manifest = ctx.globalStateStore.get("install_manifest") as Manifest;
+			const manifest = ctx.globalStateStore.get(MANIFEST_KEY) as Manifest;
 			assert.ok(manifest, "Manifest should be saved");
 			assert.strictEqual(manifest.name, expectedAsset);
 			assert.strictEqual(manifest.version, "nightly");
@@ -125,7 +121,7 @@ describe("checkAndInstall", () => {
 			fs.writeFileSync(path.join(ctx.tempDir, expectedAsset), oldAsset);
 
 			const oldDate = new Date("2025-11-20T00:00:00Z");
-			ctx.globalStateStore.set("install_manifest", {
+			ctx.globalStateStore.set(MANIFEST_KEY, {
 				name: expectedAsset,
 				version: "nightly",
 				asset_timestamp: oldDate,
@@ -155,7 +151,7 @@ describe("checkAndInstall", () => {
 				assert.ok(mode & 0o111, "File should have execute bits set");
 			}
 
-			const manifest = ctx.globalStateStore.get("install_manifest") as Manifest;
+			const manifest = ctx.globalStateStore.get(MANIFEST_KEY) as Manifest;
 			assert.ok(manifest.release_timestamp.getTime() > oldDate.getTime());
 		});
 
@@ -165,7 +161,7 @@ describe("checkAndInstall", () => {
 			const existingAsset = Buffer.from("existing-binary");
 			fs.writeFileSync(path.join(ctx.tempDir, expectedAsset), existingAsset);
 
-			ctx.globalStateStore.set("install_manifest", {
+			ctx.globalStateStore.set(MANIFEST_KEY, {
 				name: expectedAsset,
 				version: "nightly",
 				asset_timestamp: new Date("2025-12-01T00:00:00Z"),
@@ -224,7 +220,7 @@ describe("checkAndInstall", () => {
 				`Expected path to end with ${expectedAsset}, got ${result}`,
 			);
 			assert.ok(fs.existsSync(result), "Distribution should exist on disk");
-			const manifest = ctx.globalStateStore.get("install_manifest") as Manifest;
+			const manifest = ctx.globalStateStore.get(MANIFEST_KEY) as Manifest;
 			assert.ok(manifest, "Manifest should be saved");
 			assert.strictEqual(manifest.name, expectedAsset);
 			assert.strictEqual(manifest.version, "0.3.0");
@@ -235,7 +231,7 @@ describe("checkAndInstall", () => {
 			const oldAsset = Buffer.from("old-binary");
 			fs.writeFileSync(path.join(ctx.tempDir, expectedAsset), oldAsset);
 
-			ctx.globalStateStore.set("install_manifest", {
+			ctx.globalStateStore.set(MANIFEST_KEY, {
 				name: expectedAsset,
 				version: "0.1.0",
 				asset_timestamp: new Date("2025-11-15T00:00:00Z"),
@@ -255,7 +251,7 @@ describe("checkAndInstall", () => {
 
 			assert.ok(result);
 			assert.deepStrictEqual(fs.readFileSync(result), newAsset);
-			const manifest = ctx.globalStateStore.get("install_manifest") as Manifest;
+			const manifest = ctx.globalStateStore.get(MANIFEST_KEY) as Manifest;
 			assert.strictEqual(manifest.version, "0.3.0");
 		});
 
@@ -264,7 +260,7 @@ describe("checkAndInstall", () => {
 			const existingAsset = Buffer.from("existing-binary");
 			fs.writeFileSync(path.join(ctx.tempDir, expectedAsset), existingAsset);
 
-			ctx.globalStateStore.set("install_manifest", {
+			ctx.globalStateStore.set(MANIFEST_KEY, {
 				name: expectedAsset,
 				version: "0.3.0",
 				asset_timestamp: new Date("2025-12-10T00:00:00Z"),
@@ -290,12 +286,38 @@ describe("checkAndInstall", () => {
 			assert.strictEqual(assetDownloaded, false, "Asset should not have been downloaded");
 		});
 
+		it("re-downloads stable binary when file is missing from disk", async () => {
+			const expectedAsset = getExpectedAssetName();
+			const newAsset = Buffer.from("re-downloaded-binary");
+			// Note that newAsset is not written to disk.
+
+			ctx.globalStateStore.set(MANIFEST_KEY, {
+				name: expectedAsset,
+				version: "0.3.0",
+				asset_timestamp: new Date("2025-12-10T00:00:00Z"),
+				release_timestamp: new Date("2025-12-10T00:00:00Z"),
+			});
+
+			const releases = GithubFixture.multipleReleases();
+
+			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases").reply(200, releases);
+			nock(GITHUB_API)
+				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.reply(200, newAsset);
+
+			const result = await Installation.checkAndInstall(ctx.context as any);
+
+			assert.ok(result);
+			assert.ok(fs.existsSync(result), "Asset should have been re-downloaded");
+			assert.deepStrictEqual(fs.readFileSync(result), newAsset);
+		});
+
 		it("auto-upgrades from 0.1.0-rc.X to 0.1.0 stable", async () => {
 			const expectedAsset = getExpectedAssetName();
 			const oldAsset = Buffer.from("rc-binary");
 			fs.writeFileSync(path.join(ctx.tempDir, expectedAsset), oldAsset);
 
-			ctx.globalStateStore.set("install_manifest", {
+			ctx.globalStateStore.set(MANIFEST_KEY, {
 				name: expectedAsset,
 				version: "0.1.0-rc.1",
 				asset_timestamp: new Date("2025-11-10T00:00:00Z"),
@@ -319,7 +341,7 @@ describe("checkAndInstall", () => {
 
 			assert.ok(result);
 			assert.deepStrictEqual(fs.readFileSync(result), newAsset);
-			const manifest = ctx.globalStateStore.get("install_manifest") as Manifest;
+			const manifest = ctx.globalStateStore.get(MANIFEST_KEY) as Manifest;
 			assert.strictEqual(manifest.version, "0.1.0");
 		});
 
@@ -341,7 +363,7 @@ describe("checkAndInstall", () => {
 
 			assert.ok(result, `Should return an install path ending with ${expectedAsset}`);
 			assert.ok(result?.includes(expectedAsset), "Result should contain expected asset name");
-			const manifest = ctx.globalStateStore.get("install_manifest") as Manifest;
+			const manifest = ctx.globalStateStore.get(MANIFEST_KEY) as Manifest;
 			assert.ok(manifest, "Manifest should be saved");
 			assert.strictEqual(manifest.version, "0.1.0-rc.2");
 		});
@@ -360,7 +382,7 @@ describe("checkAndInstall", () => {
 				asset_timestamp: new Date("2025-11-20T00:00:00Z"),
 				release_timestamp: new Date("2025-11-20T00:00:00Z"),
 			};
-			ctx.globalStateStore.set("install_manifest", existingManifest);
+			ctx.globalStateStore.set(MANIFEST_KEY, existingManifest);
 
 			nock(GITHUB_API)
 				.get("/repos/elixir-lang/expert/releases/tags/nightly")
@@ -374,7 +396,7 @@ describe("checkAndInstall", () => {
 				`Expected path to end with ${expectedAsset}, got ${result}`,
 			);
 			assert.ok(fs.existsSync(result));
-			assert.deepStrictEqual(ctx.globalStateStore.get("install_manifest"), existingManifest);
+			assert.deepStrictEqual(ctx.globalStateStore.get(MANIFEST_KEY), existingManifest);
 		});
 
 		it("falls back to existing when GitHub is unreachable (stable)", async () => {
@@ -389,7 +411,7 @@ describe("checkAndInstall", () => {
 				asset_timestamp: new Date("2025-11-15T00:00:00Z"),
 				release_timestamp: new Date("2025-11-15T00:00:00Z"),
 			};
-			ctx.globalStateStore.set("install_manifest", existingManifest);
+			ctx.globalStateStore.set(MANIFEST_KEY, existingManifest);
 
 			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases").replyWithError("network error");
 
@@ -397,7 +419,7 @@ describe("checkAndInstall", () => {
 
 			assert.ok(result);
 			assert.ok(result?.endsWith(expectedAsset));
-			assert.deepStrictEqual(ctx.globalStateStore.get("install_manifest"), existingManifest);
+			assert.deepStrictEqual(ctx.globalStateStore.get(MANIFEST_KEY), existingManifest);
 		});
 
 		it("falls back to nightly when no stable release available", async () => {
@@ -427,7 +449,7 @@ describe("checkAndInstall", () => {
 			const result = await Installation.checkAndInstall(ctx.context as any);
 
 			assert.strictEqual(result, undefined);
-			assert.strictEqual(ctx.globalStateStore.get("install_manifest"), undefined);
+			assert.strictEqual(ctx.globalStateStore.get(MANIFEST_KEY), undefined);
 		});
 
 		it("shows notification when no manifest and GitHub is unreachable", async () => {
@@ -444,66 +466,6 @@ describe("checkAndInstall", () => {
 			assert.strictEqual(mockWindowMessages.errors.length, 1);
 			assert.strictEqual(mockWindowMessages.errors[0][0], "Failed to fetch Expert release.");
 			assert.strictEqual(mockWindowMessages.errors[0][1], "Retry");
-		});
-
-		it("shows platform mismatch notification when manifest has wrong platform and GitHub is unreachable", async () => {
-			mockConfigValues.values["nightly"] = true;
-			mockWindowMessages.errors.length = 0;
-
-			const wrongAsset = getWrongPlatformAssetName();
-			ctx.globalStateStore.set("install_manifest", {
-				name: wrongAsset,
-				version: "nightly",
-				asset_timestamp: new Date("2025-11-20T00:00:00Z"),
-				release_timestamp: new Date("2025-11-20T00:00:00Z"),
-			});
-
-			nock(GITHUB_API)
-				.get("/repos/elixir-lang/expert/releases/tags/nightly")
-				.replyWithError("network error");
-
-			const result = await Installation.checkAndInstall(ctx.context as any);
-
-			const { platform, arch } = getPlatformInfo();
-			const manifestPlatform = wrongAsset.replace(/^expert_/, "");
-
-			assert.strictEqual(result, undefined);
-			assert.strictEqual(mockWindowMessages.errors.length, 1);
-			assert.strictEqual(
-				mockWindowMessages.errors[0][0],
-				`Current Expert binary is for ${manifestPlatform} but you're on ${platform}_${arch}. Failed to download correct version.`,
-			);
-			assert.strictEqual(mockWindowMessages.errors[0][1], "Retry");
-		});
-
-		it("re-downloads correct binary when manifest has wrong platform and GitHub is reachable", async () => {
-			mockConfigValues.values["nightly"] = false;
-
-			const wrongAsset = getWrongPlatformAssetName();
-			const expectedAsset = getExpectedAssetName();
-			ctx.globalStateStore.set("install_manifest", {
-				name: wrongAsset,
-				version: "0.3.0",
-				asset_timestamp: new Date("2025-12-10T00:00:00Z"),
-				release_timestamp: new Date("2025-12-10T00:00:00Z"),
-			});
-
-			const releases = GithubFixture.multipleReleases();
-			const newAsset = Buffer.from("correct-platform-binary");
-
-			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases").reply(200, releases);
-			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
-				.reply(200, newAsset);
-
-			const result = await Installation.checkAndInstall(ctx.context as any);
-
-			assert.ok(result);
-			assert.strictEqual(path.basename(result), expectedAsset);
-			assert.deepStrictEqual(fs.readFileSync(result), newAsset);
-
-			const manifest = ctx.globalStateStore.get("install_manifest") as Manifest;
-			assert.strictEqual(manifest.name, expectedAsset);
 		});
 	});
 });

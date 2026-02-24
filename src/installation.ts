@@ -11,7 +11,7 @@ import {
 	shouldAutoUpgradeFromRC,
 } from "./github";
 import * as Logger from "./logger";
-import { getExpectedAssetName, getPlatformInfo } from "./platform";
+import { getPlatformInfo } from "./platform";
 
 /**
  * Metadata to persist between restarts of the extension. Used to track which distribution of
@@ -25,6 +25,16 @@ export interface Manifest {
 }
 
 /**
+ * Returns a platform-scoped globalState key for the install manifest.
+ * This ensures each platform (e.g. host macOS vs. Dev Container Linux)
+ * maintains its own manifest independently.
+ */
+export function getManifestKey(): string {
+	const { platform, arch } = getPlatformInfo();
+	return `install_manifest:${platform}_${arch}`;
+}
+
+/**
  *
  * @param context Expert's extension context.
  * @returns Installation path if available.
@@ -34,9 +44,14 @@ export async function checkAndInstall(
 	attemptCount: number = 0,
 ): Promise<string | undefined> {
 	const nightly = Configuration.getNightly();
-	const manifest = context.globalState.get<Manifest>("install_manifest");
 
-	if (manifest === undefined) {
+	// Delete the legacy manifest key
+	await context.globalState.update("install_manifest", undefined);
+
+	// Fetch the platform-specific manifest key
+	const manifest = context.globalState.get<Manifest>(getManifestKey());
+
+	if (manifest === undefined || !fs.existsSync(manifestAssetPath(context, manifest))) {
 		Logger.info(
 			nightly
 				? "Language server is not installed, fetching latest nightly from GitHub..."
@@ -61,16 +76,18 @@ export async function checkAndInstall(
 			error: errorMessage,
 		});
 
-		const expectedAssetName = getExpectedAssetName();
-		if (manifest.name.startsWith(expectedAssetName)) {
-			return Uri.joinPath(context.globalStorageUri, manifest.name).fsPath;
+		const assetPath = manifestAssetPath(context, manifest);
+		if (fs.existsSync(assetPath)) {
+			return assetPath;
 		}
 
-		const { platform, arch } = getPlatformInfo();
-		const manifestPlatform = manifest.name.replace(/^expert_/, "").replace(/\.exe$/, "");
-		showFetchFailedNotification(context, attemptCount, manifestPlatform, `${platform}_${arch}`);
+		showFetchFailedNotification(context, attemptCount);
 		return undefined;
 	}
+}
+
+function manifestAssetPath(context: ExtensionContext, manifest: Manifest): string {
+	return Uri.joinPath(context.globalStorageUri, manifest.name).fsPath;
 }
 
 function normalizeManifest(manifest: Manifest): Manifest {
@@ -111,7 +128,7 @@ async function mustInstallNightly(context: ExtensionContext): Promise<string | u
 		release_timestamp: new Date(nightlyRelease.updated_at as string),
 	};
 
-	await context.globalState.update("install_manifest", manifest);
+	await context.globalState.update(getManifestKey(), manifest);
 
 	return installPath;
 }
@@ -139,7 +156,7 @@ async function mustInstallStable(context: ExtensionContext): Promise<string | un
 		release_timestamp: new Date(stableRelease.updated_at as string),
 	};
 
-	await context.globalState.update("install_manifest", manifest);
+	await context.globalState.update(getManifestKey(), manifest);
 
 	return installPath;
 }
@@ -219,7 +236,7 @@ async function compareAndInstallNightly(
 		release_timestamp: new Date(nightlyRelease.updated_at as string),
 	};
 
-	await context.globalState.update("install_manifest", newManifest);
+	await context.globalState.update(getManifestKey(), newManifest);
 
 	notifyAutoInstallSuccess(newManifest.version);
 
@@ -244,10 +261,10 @@ async function compareAndInstallStable(
 	const needsUpdate =
 		currentVersion !== newVersion || shouldAutoUpgradeFromRC(currentVersion, newVersion);
 
-	if (!needsUpdate && manifest.name.startsWith(getExpectedAssetName())) {
+	const assetPath = manifestAssetPath(context, manifest);
+	if (!needsUpdate && fs.existsSync(assetPath)) {
 		Logger.info(`Using currently installed stable version (${currentVersion}), no download needed`);
-		const installPath = Uri.joinPath(context.globalStorageUri, manifest.name);
-		return installPath.fsPath;
+		return assetPath;
 	}
 
 	Logger.info(`Downloading stable release ${newVersion}...`);
@@ -266,7 +283,7 @@ async function compareAndInstallStable(
 		release_timestamp: new Date(stableRelease.updated_at as string),
 	};
 
-	await context.globalState.update("install_manifest", newManifest);
+	await context.globalState.update(getManifestKey(), newManifest);
 
 	notifyAutoInstallSuccess(newManifest.version);
 
@@ -381,25 +398,17 @@ export async function checkForUpdates(context: ExtensionContext): Promise<string
 	const result = await checkAndInstall(context);
 
 	if (result !== undefined) {
-		const manifest = context.globalState.get<Manifest>("install_manifest");
+		const manifest = context.globalState.get<Manifest>(getManifestKey());
 		window.showInformationMessage(`Expert is up to date (${manifest?.version ?? "unknown"}).`);
 	}
 
 	return result;
 }
 
-function showFetchFailedNotification(
-	context: ExtensionContext,
-	attemptCount: number,
-	manifestPlatform?: string,
-	currentPlatform?: string,
-) {
+function showFetchFailedNotification(context: ExtensionContext, attemptCount: number) {
 	const attempt = attemptCount > 0 ? ` (Attempt #${attemptCount + 1})` : "";
 
-	const message =
-		manifestPlatform && currentPlatform
-			? `Current Expert binary is for ${manifestPlatform} but you're on ${currentPlatform}. Failed to download correct version${attempt}.`
-			: `Failed to fetch Expert release${attempt}.`;
+	const message = `Failed to fetch Expert release${attempt}.`;
 
 	const retry = "Retry";
 	window.showErrorMessage(message, retry).then((selected) => {
