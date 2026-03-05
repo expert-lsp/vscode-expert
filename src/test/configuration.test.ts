@@ -59,6 +59,45 @@ describe("Configuration", () => {
 		});
 	});
 
+	describe("getLogLevel", () => {
+		it("returns 'info' by default when not configured", () => {
+			assert.strictEqual(Configuration.getLogLevel(), "info");
+		});
+
+		it("returns the configured log level", () => {
+			mockConfigValues.values = { logLevel: "error" };
+			assert.strictEqual(Configuration.getLogLevel(), "error");
+		});
+	});
+
+	describe("getWorkspaceSymbolsMinQueryLength", () => {
+		it("returns 2 by default when not configured", () => {
+			assert.strictEqual(Configuration.getWorkspaceSymbolsMinQueryLength(), 2);
+		});
+
+		it("returns the configured value", () => {
+			mockConfigValues.values = { "workspaceSymbols.minQueryLength": 0 };
+			assert.strictEqual(Configuration.getWorkspaceSymbolsMinQueryLength(), 0);
+		});
+	});
+
+	describe("getServerSettings", () => {
+		it("returns defaults when nothing is configured", () => {
+			assert.deepStrictEqual(Configuration.getServerSettings(), {
+				logLevel: "info",
+				workspaceSymbols: { minQueryLength: 2 },
+			});
+		});
+
+		it("reflects configured values", () => {
+			mockConfigValues.values = { logLevel: "warning", "workspaceSymbols.minQueryLength": 5 };
+			assert.deepStrictEqual(Configuration.getServerSettings(), {
+				logLevel: "warning",
+				workspaceSymbols: { minQueryLength: 5 },
+			});
+		});
+	});
+
 	describe("getAutoInstallUpdateNotification", () => {
 		it("returns true by default when not configured", () => {
 			assert.strictEqual(Configuration.getAutoInstallUpdateNotification(), true);

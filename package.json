@@ -171,6 +171,25 @@
           "default": false,
           "markdownDescription": "Install the nightly release of Expert instead of stable releases. Nightly builds contain the latest features but may be less stable."
         },
+        "expert.server.logLevel": {
+          "scope": "window",
+          "type": "string",
+          "enum": [
+            "error",
+            "warning",
+            "info",
+            "log"
+          ],
+          "default": "info",
+          "markdownDescription": "Sets the log level for the Expert language server."
+        },
+        "expert.server.workspaceSymbols.minQueryLength": {
+          "scope": "window",
+          "type": "integer",
+          "default": 2,
+          "minimum": 0,
+          "markdownDescription": "Minimum number of characters required to trigger workspace symbol search."
+        },
         "expert.notifyOnServerAutoUpdate": {
           "scope": "window",
           "type": "boolean",

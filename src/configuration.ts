@@ -20,6 +20,23 @@ export function getStartupFlagsOverride() {
 	return getBaseConfig().get<string | undefined>("startupFlagsOverride", undefined);
 }
 
+export function getLogLevel() {
+	return getBaseConfig().get<string>("logLevel", "info");
+}
+
+export function getWorkspaceSymbolsMinQueryLength() {
+	return getBaseConfig().get<number>("workspaceSymbols.minQueryLength", 2);
+}
+
+export function getServerSettings() {
+	return {
+		logLevel: getLogLevel(),
+		workspaceSymbols: {
+			minQueryLength: getWorkspaceSymbolsMinQueryLength(),
+		},
+	};
+}
+
 export function getProjectDirUri(workspace: typeof vsWorkspace): Uri {
 	const projectDirConfig = getBaseConfig().get<string>("projectDir");
 

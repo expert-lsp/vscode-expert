@@ -72,8 +72,23 @@ export function deactivate() {
 async function start(serverOptions: ServerOptions, workspaceUri: Uri): Promise<LanguageClient> {
 	Logger.info(`Starting Expert in workspace ${workspaceUri?.fsPath}`);
 
+	let lspClient!: LanguageClient;
+
 	const clientOptions: LanguageClientOptions = {
 		outputChannel: Logger.outputChannel(),
+		initializationOptions: Configuration.getServerSettings(),
+		synchronize: {
+			configurationSection: "expert.server",
+		},
+		middleware: {
+			workspace: {
+				didChangeConfiguration: async (_sections, _next) => {
+					await lspClient.sendNotification("workspace/didChangeConfiguration", {
+						settings: Configuration.getServerSettings(),
+					});
+				},
+			},
+		},
 		// Register the server for Elixir documents
 		// the client will iterate through this list and chose the first matching element
 		documentSelector: [
@@ -95,6 +110,7 @@ async function start(serverOptions: ServerOptions, workspaceUri: Uri): Promise<L
 	};
 
 	const client = new LanguageClient("expert", "Expert", serverOptions, clientOptions);
+	lspClient = client;
 
 	try {
 		await client.start();
