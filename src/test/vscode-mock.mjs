@@ -113,5 +113,6 @@ export const workspace = {
 		};
 		return config;
 	},
+	onDidChangeConfiguration: () => ({ dispose: () => {} }),
 	workspaceFolders: [{ uri: { path: "/test/workspace" } }],
 };
