@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.4.0](https://github.com/expert-lsp/vscode-expert/compare/v0.3.1...v0.4.0) (2026-03-05)
+
+
+### Features
+
+* support expert's configurations ([#33](https://github.com/expert-lsp/vscode-expert/issues/33)) ([7c1d4f9](https://github.com/expert-lsp/vscode-expert/commit/7c1d4f94969524e086b3cfa9879dd67dbe67c4e6))
+
 ## [0.3.1](https://github.com/expert-lsp/vscode-expert/compare/v0.3.0...v0.3.1) (2026-02-24)
 
 
