@@ -57,6 +57,12 @@ export function getAutoInstallUpdateNotification() {
 	return getExpertConfig().get<boolean>("notifyOnServerAutoUpdate", true);
 }
 
+export type VersionManager = "none" | "auto" | "asdf" | "mise";
+
+export function getVersionManager(): VersionManager {
+	return getBaseConfig().get<VersionManager>("versionManager", "auto");
+}
+
 export function getNightly() {
 	return getBaseConfig().get<boolean>("nightly", false);
 }
