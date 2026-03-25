@@ -64,7 +64,8 @@ describe("Extension activation with configuration", () => {
 				getReleasePathOverride: () => configValues.releasePathOverride,
 				getStartupFlagsOverride: () => configValues.startupFlagsOverride,
 				getProjectDir: () => configValues.projectDir,
-				getServerSettings: () => ({ projectDir: configValues.projectDir }),
+				getServerSettings: () => ({ logLevel: configValues.logLevel ?? "info", projectDir: configValues.projectDir }),
+				getVersionManager: () => configValues.versionManager ?? "none",
 			},
 		});
 	});

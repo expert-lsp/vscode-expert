@@ -161,27 +161,6 @@ describe("Configuration", () => {
 		});
 	});
 
-	describe("getProjectDirUri", () => {
-		it("returns the workspace URI when project dir is not configured", () => {
-			const workspace = WorkspaceFixture.withUri(Uri.file("/stub"));
-
-			const projectDirUri = Configuration.getProjectDirUri(workspace);
-
-			assert.strictEqual(projectDirUri.fsPath, "/stub");
-			assert.strictEqual(projectDirUri.scheme, "file");
-		});
-
-		it("returns the full directory URI when project dir is configured", () => {
-			const workspace = WorkspaceFixture.withUri(Uri.file("/stub"));
-			mockConfigValues.values = { projectDir: "subdirectory" };
-
-			const projectDirUri = Configuration.getProjectDirUri(workspace);
-
-			assert.strictEqual(projectDirUri.fsPath, "/stub/subdirectory");
-			assert.strictEqual(projectDirUri.scheme, "file");
-		});
-	});
-
 	describe("getVersionManager", () => {
 		it("returns 'auto' by default when not configured", () => {
 			assert.strictEqual(Configuration.getVersionManager(), "auto");
@@ -190,27 +169,6 @@ describe("Configuration", () => {
 		it("returns 'mise' when explicitly set", () => {
 			mockConfigValues.values = { versionManager: "mise" };
 			assert.strictEqual(Configuration.getVersionManager(), "mise");
-		});
-	});
-
-	describe("getProjectDirUri", () => {
-		it("returns the workspace URI when project dir is not configured", () => {
-			const workspace = WorkspaceFixture.withUri(Uri.file("/stub"));
-
-			const projectDirUri = Configuration.getProjectDirUri(workspace);
-
-			assert.strictEqual(projectDirUri.fsPath, "/stub");
-			assert.strictEqual(projectDirUri.scheme, "file");
-		});
-
-		it("returns the full directory URI when project dir is configured", () => {
-			const workspace = WorkspaceFixture.withUri(Uri.file("/stub"));
-			mockConfigValues.values = { projectDir: "subdirectory" };
-
-			const projectDirUri = Configuration.getProjectDirUri(workspace);
-
-			assert.strictEqual(projectDirUri.fsPath, "/stub/subdirectory");
-			assert.strictEqual(projectDirUri.scheme, "file");
 		});
 	});
 });
