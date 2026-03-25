@@ -1,3 +1,7 @@
+// Adapted from https://github.com/Shopify/ruby-lsp/blob/main/vscode/src/ruby/mise.ts
+// Copyright (c) 2021-present Shopify Inc.
+// Licensed under the MIT License: https://opensource.org/licenses/MIT
+
 import { EnvResult, VersionManager } from "./versionManager";
 import * as vscode from "vscode";
 import path from "path";
