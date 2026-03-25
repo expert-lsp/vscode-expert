@@ -9,13 +9,14 @@ import os from "os";
 import * as Logger from "../logger";
 
 export interface Env {
-  elixirPath: string | undefined;
-  erlangPath: string | undefined;
+  elixirDir: string | undefined;
+  erlangDir: string | undefined;
 }
 
 export type EnvResult =
   | { detected: false }
-  | { detected: true; env: Env };
+  | { detected: true; env: Env }
+  | { detected: "error"; message: string };
 
 export abstract class VersionManager {
   protected readonly workspaceFolder: vscode.WorkspaceFolder;
@@ -68,4 +69,45 @@ export abstract class VersionManager {
   protected async asyncExec(command: string, options: object) {
     return promisify(exec)(command, options);
   }
+}
+
+export async function resolveEnv(
+  setting: "none" | "auto" | "asdf" | "mise",
+  workspaceFolder: vscode.WorkspaceFolder,
+  context: vscode.ExtensionContext,
+): Promise<EnvResult> {
+
+  if (setting === "none") {
+    Logger.info("Version manager integration disabled via configuration.");
+    return { detected: false };
+  }
+
+  const isAuto = setting === "auto";
+
+  if (setting === "mise" || isAuto) {
+    const { MiseVersionManager } = await import("./mise");
+    const result = await new MiseVersionManager(workspaceFolder, context).getEnv();
+    if (result.detected) {
+      Logger.info(isAuto ? "Detected version manager: mise" : "Using configured version manager: mise");
+      return result;
+    }
+    if (!isAuto) {
+      return { detected: "error", message: "Configured version manager 'mise' was not found." };
+    }
+  }
+
+  if (setting === "asdf" || isAuto) {
+    const { AsdfVersionManager } = await import("./asdf");
+    const result = await new AsdfVersionManager(workspaceFolder, context).getEnv();
+    if (result.detected) {
+      Logger.info(isAuto ? "Detected version manager: asdf" : "Using configured version manager: asdf");
+      return result;
+    }
+    if (!isAuto) {
+      return { detected: "error", message: "Configured version manager 'asdf' was not found." };
+    }
+  }
+
+  Logger.info("No version manager detected, using system environment.");
+  return { detected: false };
 }

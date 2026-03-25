@@ -6,6 +6,7 @@ import { EnvResult, VersionManager } from "./versionManager";
 import * as vscode from "vscode";
 import path from "path";
 import os from "os";
+import * as Logger from "../logger";
 
 export class AsdfVersionManager extends VersionManager {
   constructor(workspaceFolder: vscode.WorkspaceFolder, context: vscode.ExtensionContext) {
@@ -32,16 +33,28 @@ export class AsdfVersionManager extends VersionManager {
     // a shell script and we have to source it first
     const baseCommand = path.extname(asdfPath) === "" ? asdfPath : `. ${asdfPath} && asdf`;
 
-    const {stdout: elixirPath} = await this.runScript(`${baseCommand} which elixir`);
-    const {stdout: erlangPath} = await this.runScript(`${baseCommand} which erlang`);
+    const elixirDir = await this.whichDir(baseCommand, "elixir");
+    const erlangDir = await this.whichDir(baseCommand, "erl");
+
+    if (elixirDir === undefined || erlangDir === undefined) {
+      Logger.warn(`Detected asdf but could not find elixir or erlang binaries. Elixir: ${elixirDir}, Erlang: ${erlangDir}`);
+      return { detected: false };
+    }
 
     return {
       detected: true,
-      env: {
-        elixirPath: elixirPath.trim(),
-        erlangPath: erlangPath.trim(),
-      },
+      env: { elixirDir, erlangDir },
     };
+  }
+
+  private async whichDir(baseCommand: string, execName: string): Promise<string | undefined> {
+    try {
+      const { stdout } = await this.runScript(`${baseCommand} which ${execName}`);
+      return path.dirname(stdout.trim());
+    } catch (error: any) {
+      Logger.debug(`asdf which ${execName} failed: ${error.message}`);
+      return undefined;
+    }
   }
 
   // Finds the ASDF installation URI based on what's advertised in the ASDF documentation

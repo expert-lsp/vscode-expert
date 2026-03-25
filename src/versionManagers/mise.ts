@@ -1,6 +1,8 @@
 import { EnvResult, VersionManager } from "./versionManager";
 import * as vscode from "vscode";
+import path from "path";
 import os from "os";
+import * as Logger from "../logger";
 
 export class MiseVersionManager extends VersionManager {
   constructor(workspaceFolder: vscode.WorkspaceFolder, context: vscode.ExtensionContext) {
@@ -14,16 +16,28 @@ export class MiseVersionManager extends VersionManager {
       return { detected: false };
     }
 
-    const {stdout: elixirPath} = await this.runScript(`${misePath} which elixir`);
-    const {stdout: erlangPath} = await this.runScript(`${misePath} which erlang`);
+    const elixirDir = await this.whichDir(misePath, "elixir");
+    const erlangDir = await this.whichDir(misePath, "erl");
+
+    if (elixirDir === undefined || erlangDir === undefined) {
+      Logger.warn(`Detected mise but could not find elixir or erlang binaries. Elixir: ${elixirDir}, Erlang: ${erlangDir}`);
+      return { detected: false };
+    }
 
     return {
       detected: true,
-      env: {
-        elixirPath: elixirPath.trim(),
-        erlangPath: erlangPath.trim(),
-      },
+      env: { elixirDir, erlangDir },
     };
+  }
+
+  private async whichDir(misePath: string, execName: string): Promise<string | undefined> {
+    try {
+      const { stdout } = await this.runScript(`${misePath} which ${execName}`);
+      return path.dirname(stdout.trim());
+    } catch (error: any) {
+      Logger.debug(`mise which ${execName} failed: ${error.message}`);
+      return undefined;
+    }
   }
 
   private async findMiseInstallation(): Promise<string | undefined> {

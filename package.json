@@ -175,7 +175,7 @@
             "mise"
           ],
           "default": "auto",
-          "markdownDescription": "The version manager to use for resolving the runtime. `auto` will detect the version manager automatically, `none` disables version manager integration to use system versions."
+          "markdownDescription": "The version manager to use for resolving the runtime. `auto` will detect the version manager automatically, `none` disables version manager integration to use system versions. Changing this setting requires restarting the extension."
         },
         "expert.server.nightly": {
           "scope": "window",
