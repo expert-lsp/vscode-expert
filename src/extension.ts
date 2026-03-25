@@ -178,7 +178,11 @@ async function getServerStartupOptions(
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	const envResult = await resolveEnv(Configuration.getVersionManager(), workspace.workspaceFolders![0], context);
+	const envResult = await resolveEnv(
+		Configuration.getVersionManager(),
+		workspace.workspaceFolders![0],
+		context,
+	);
 
 	if (envResult.detected === "error") {
 		Logger.error(envResult.message);
