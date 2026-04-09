@@ -70,6 +70,17 @@ describe("Configuration", () => {
 		});
 	});
 
+	describe("getFileLogLevel", () => {
+		it("returns 'default' by default when not configured", () => {
+			assert.strictEqual(Configuration.getFileLogLevel(), "default");
+		});
+
+		it("returns the configured file log level", () => {
+			mockConfigValues.values = { fileLogLevel: "debug" };
+			assert.strictEqual(Configuration.getFileLogLevel(), "debug");
+		});
+	});
+
 	describe("getWorkspaceSymbolsMinQueryLength", () => {
 		it("returns 2 by default when not configured", () => {
 			assert.strictEqual(Configuration.getWorkspaceSymbolsMinQueryLength(), 2);
@@ -85,14 +96,30 @@ describe("Configuration", () => {
 		it("returns defaults when nothing is configured", () => {
 			assert.deepStrictEqual(Configuration.getServerSettings(), {
 				logLevel: "info",
+				fileLogLevel: null,
 				workspaceSymbols: { minQueryLength: 2 },
 			});
 		});
 
+		it("sends null for fileLogLevel when set to 'default'", () => {
+			mockConfigValues.values = { fileLogLevel: "default" };
+			assert.strictEqual(Configuration.getServerSettings().fileLogLevel, null);
+		});
+
+		it("sends the value for fileLogLevel when set to a non-default value", () => {
+			mockConfigValues.values = { fileLogLevel: "debug" };
+			assert.strictEqual(Configuration.getServerSettings().fileLogLevel, "debug");
+		});
+
 		it("reflects configured values", () => {
-			mockConfigValues.values = { logLevel: "warning", "workspaceSymbols.minQueryLength": 5 };
+			mockConfigValues.values = {
+				logLevel: "warning",
+				fileLogLevel: "error",
+				"workspaceSymbols.minQueryLength": 5,
+			};
 			assert.deepStrictEqual(Configuration.getServerSettings(), {
 				logLevel: "warning",
+				fileLogLevel: "error",
 				workspaceSymbols: { minQueryLength: 5 },
 			});
 		});
