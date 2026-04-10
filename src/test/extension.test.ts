@@ -64,7 +64,11 @@ describe("Extension activation with configuration", () => {
 				getReleasePathOverride: () => configValues.releasePathOverride,
 				getStartupFlagsOverride: () => configValues.startupFlagsOverride,
 				getLogLevel: () => configValues.logLevel ?? "info",
-				getServerSettings: () => ({ logLevel: configValues.logLevel ?? "info" }),
+				getFileLogLevel: () => configValues.fileLogLevel ?? "default",
+				getServerSettings: () => ({
+					logLevel: configValues.logLevel ?? "info",
+					fileLogLevel: null,
+				}),
 				getProjectDirUri: () => ({ path: "/test/workspace", fsPath: "/test/workspace" }),
 			},
 		});

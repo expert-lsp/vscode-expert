@@ -183,6 +183,19 @@
           "default": "info",
           "markdownDescription": "Sets the log level for the Expert language server."
         },
+        "expert.server.fileLogLevel": {
+          "scope": "window",
+          "type": "string",
+          "enum": [
+            "default",
+            "debug",
+            "info",
+            "warning",
+            "error"
+          ],
+          "default": "default",
+          "markdownDescription": "Sets the file log level for the Expert language server. When set to \"default\", the server's built-in default is used."
+        },
         "expert.server.workspaceSymbols.minQueryLength": {
           "scope": "window",
           "type": "integer",

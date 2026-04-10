@@ -24,13 +24,20 @@ export function getLogLevel() {
 	return getBaseConfig().get<string>("logLevel", "info");
 }
 
+export function getFileLogLevel() {
+	return getBaseConfig().get<string>("fileLogLevel", "default");
+}
+
 export function getWorkspaceSymbolsMinQueryLength() {
 	return getBaseConfig().get<number>("workspaceSymbols.minQueryLength", 2);
 }
 
 export function getServerSettings() {
+	const fileLogLevel = getFileLogLevel();
+
 	return {
 		logLevel: getLogLevel(),
+		fileLogLevel: fileLogLevel === "default" ? null : fileLogLevel,
 		workspaceSymbols: {
 			minQueryLength: getWorkspaceSymbolsMinQueryLength(),
 		},
