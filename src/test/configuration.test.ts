@@ -1,7 +1,5 @@
 import assert from "node:assert";
 import { before, beforeEach, describe, it } from "node:test";
-import { Uri } from "vscode";
-import * as WorkspaceFixture from "./fixtures/workspace-fixture";
 import { mockConfigValues, mockUpdateCalls } from "./vscode-mock.mjs";
 
 type ConfigurationModule = typeof import("../configuration");
@@ -92,11 +90,23 @@ describe("Configuration", () => {
 		});
 	});
 
+	describe("getProjectDir", () => {
+		it("returns undefined by default when not configured", () => {
+			assert.strictEqual(Configuration.getProjectDir(), undefined);
+		});
+
+		it("returns the configured project directory", () => {
+			mockConfigValues.values = { projectDir: "subdirectory" };
+			assert.strictEqual(Configuration.getProjectDir(), "subdirectory");
+		});
+	});
+
 	describe("getServerSettings", () => {
 		it("returns defaults when nothing is configured", () => {
 			assert.deepStrictEqual(Configuration.getServerSettings(), {
 				logLevel: "info",
 				fileLogLevel: null,
+				projectDir: undefined,
 				workspaceSymbols: { minQueryLength: 2 },
 			});
 		});
@@ -115,11 +125,13 @@ describe("Configuration", () => {
 			mockConfigValues.values = {
 				logLevel: "warning",
 				fileLogLevel: "error",
+				projectDir: "apps/my_app",
 				"workspaceSymbols.minQueryLength": 5,
 			};
 			assert.deepStrictEqual(Configuration.getServerSettings(), {
 				logLevel: "warning",
 				fileLogLevel: "error",
+				projectDir: "apps/my_app",
 				workspaceSymbols: { minQueryLength: 5 },
 			});
 		});
@@ -146,27 +158,6 @@ describe("Configuration", () => {
 				value: false,
 				target: 1, // ConfigurationTarget.Global
 			});
-		});
-	});
-
-	describe("getProjectDirUri", () => {
-		it("returns the workspace URI when project dir is not configured", () => {
-			const workspace = WorkspaceFixture.withUri(Uri.file("/stub"));
-
-			const projectDirUri = Configuration.getProjectDirUri(workspace);
-
-			assert.strictEqual(projectDirUri.fsPath, "/stub");
-			assert.strictEqual(projectDirUri.scheme, "file");
-		});
-
-		it("returns the full directory URI when project dir is configured", () => {
-			const workspace = WorkspaceFixture.withUri(Uri.file("/stub"));
-			mockConfigValues.values = { projectDir: "subdirectory" };
-
-			const projectDirUri = Configuration.getProjectDirUri(workspace);
-
-			assert.strictEqual(projectDirUri.fsPath, "/stub/subdirectory");
-			assert.strictEqual(projectDirUri.scheme, "file");
 		});
 	});
 });
