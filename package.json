@@ -238,6 +238,11 @@
         "title": "Check for updates"
       },
       {
+        "command": "expert.server.remoteShell",
+        "category": "Expert",
+        "title": "Open remote shell"
+      },
+      {
         "command": "expert.github.login",
         "category": "Expert",
         "title": "Sign in with GitHub",

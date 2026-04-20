@@ -49,6 +49,7 @@ export async function activate(context: ExtensionContext): Promise<LanguageClien
 			commands.registerCommand("expert.server.stop", () => Commands.stop(client!)),
 			commands.registerCommand("expert.server.restart", () => Commands.restart(client!)),
 			commands.registerCommand("expert.server.reindex", () => Commands.reindex(client!)),
+			commands.registerCommand("expert.server.remoteShell", () => Commands.remoteShell(client!)),
 		);
 
 		return client;
