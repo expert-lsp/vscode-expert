@@ -88,7 +88,7 @@ describe("checkAndInstall", () => {
 			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases/tags/nightly").reply(200, release);
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, fakeAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -139,7 +139,7 @@ describe("checkAndInstall", () => {
 				.reply(200, checksumsContent(expectedAsset, newAsset));
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, newAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -178,7 +178,7 @@ describe("checkAndInstall", () => {
 				.reply(200, checksumsContent(expectedAsset, existingAsset));
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, () => {
 					assetDownloaded = true;
 					return Buffer.from("should-not-download");
@@ -209,7 +209,7 @@ describe("checkAndInstall", () => {
 			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, releases);
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, fakeAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -244,7 +244,7 @@ describe("checkAndInstall", () => {
 			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, releases);
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, newAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -273,7 +273,7 @@ describe("checkAndInstall", () => {
 			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, releases);
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, () => {
 					assetDownloaded = true;
 					return Buffer.from("should-not-download");
@@ -302,7 +302,7 @@ describe("checkAndInstall", () => {
 
 			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, releases);
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, newAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -334,7 +334,7 @@ describe("checkAndInstall", () => {
 			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, releases);
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, newAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -356,7 +356,7 @@ describe("checkAndInstall", () => {
 			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, releases);
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, fakeAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -431,7 +431,7 @@ describe("checkAndInstall", () => {
 			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, []);
 			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases/tags/nightly").reply(200, release);
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, fakeAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
