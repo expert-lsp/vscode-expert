@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.5.0](https://github.com/expert-lsp/vscode-expert/compare/v0.4.0...v0.5.0) (2026-04-23)
+
+
+### Features
+
+* support fileLogLevel setting ([#38](https://github.com/expert-lsp/vscode-expert/issues/38)) ([f8da18f](https://github.com/expert-lsp/vscode-expert/commit/f8da18ffe33d284b7b05cacdbb22fc72cc54bb6f))
+
+
+### Bug Fixes
+
+* update repo url to expert-lsp ([#43](https://github.com/expert-lsp/vscode-expert/issues/43)) ([bda2c86](https://github.com/expert-lsp/vscode-expert/commit/bda2c869ab6ad58cc30c58e0a31b2a30a4d18e07))
+
 ## [0.4.0](https://github.com/expert-lsp/vscode-expert/compare/v0.3.1...v0.4.0) (2026-03-05)
 
 
