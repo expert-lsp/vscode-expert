@@ -424,7 +424,7 @@ function notifyAutoInstallSuccess(version: string) {
 	}
 
 	const disableNotificationMessage = "Disable this notification";
-	const releaseUrl = `https://github.com/elixir-lang/expert/releases/tag/${version}`;
+	const releaseUrl = `https://github.com/expert-lsp/expert/releases/tag/${version}`;
 	const message = `Expert was automatically updated to version ${version}. See [what's new](${releaseUrl}).`;
 
 	window.showInformationMessage(message, disableNotificationMessage).then((fulfilledValue) => {

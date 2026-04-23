@@ -9,7 +9,7 @@ The official language extension for Expert, Elixir's offical language server.
 
 ## ⚠️ Early Access ⚠️
 
-Expert is currently in pre-1.0 early access. Pull requests and issues are welcome in the offical [GitHub repo](https://github.com/elixir-lang/expert). 
+Expert is currently in pre-1.0 early access. Pull requests and issues are welcome in the offical [GitHub repo](https://github.com/expert-lsp/expert). 
 
 ## Features
 
