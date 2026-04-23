@@ -36,11 +36,11 @@ export function nightlyRelease(updatedAt?: string): GitHubRelease {
 	const timestamp = updatedAt || "2025-11-22T00:24:06Z";
 
 	return {
-		url: "https://api.github.com/repos/elixir-lang/expert/releases/264483024",
-		assets_url: "https://api.github.com/repos/elixir-lang/expert/releases/264483024/assets",
+		url: "https://api.github.com/repos/expert-lsp/expert/releases/264483024",
+		assets_url: "https://api.github.com/repos/expert-lsp/expert/releases/264483024/assets",
 		upload_url:
-			"https://uploads.github.com/repos/elixir-lang/expert/releases/264483024/assets{?name,label}",
-		html_url: "https://github.com/elixir-lang/expert/releases/tag/nightly",
+			"https://uploads.github.com/repos/expert-lsp/expert/releases/264483024/assets{?name,label}",
+		html_url: "https://github.com/expert-lsp/expert/releases/tag/nightly",
 		id: 264483024,
 		author: {
 			login: "github-actions[bot]",
@@ -75,7 +75,7 @@ export function nightlyRelease(updatedAt?: string): GitHubRelease {
 		published_at: timestamp,
 		assets: [
 			{
-				url: "https://api.github.com/repos/elixir-lang/expert/releases/assets/319436622",
+				url: "https://api.github.com/repos/expert-lsp/expert/releases/assets/319436622",
 				id: 319436622,
 				node_id: "RA_kwDOMzhD084TCjdO",
 				name: "expert_checksums.txt",
@@ -89,10 +89,10 @@ export function nightlyRelease(updatedAt?: string): GitHubRelease {
 				created_at: timestamp,
 				updated_at: timestamp,
 				browser_download_url:
-					"https://github.com/elixir-lang/expert/releases/download/nightly/expert_checksums.txt",
+					"https://github.com/expert-lsp/expert/releases/download/nightly/expert_checksums.txt",
 			},
 			{
-				url: "https://api.github.com/repos/elixir-lang/expert/releases/assets/319436620",
+				url: "https://api.github.com/repos/expert-lsp/expert/releases/assets/319436620",
 				id: 319436620,
 				node_id: "RA_kwDOMzhD084TCjdM",
 				name: "expert_darwin_amd64",
@@ -106,10 +106,10 @@ export function nightlyRelease(updatedAt?: string): GitHubRelease {
 				created_at: timestamp,
 				updated_at: timestamp,
 				browser_download_url:
-					"https://github.com/elixir-lang/expert/releases/download/nightly/expert_darwin_amd64",
+					"https://github.com/expert-lsp/expert/releases/download/nightly/expert_darwin_amd64",
 			},
 			{
-				url: "https://api.github.com/repos/elixir-lang/expert/releases/assets/319436621",
+				url: "https://api.github.com/repos/expert-lsp/expert/releases/assets/319436621",
 				id: 319436621,
 				node_id: "RA_kwDOMzhD084TCjdN",
 				name: "expert_darwin_arm64",
@@ -123,10 +123,10 @@ export function nightlyRelease(updatedAt?: string): GitHubRelease {
 				created_at: timestamp,
 				updated_at: timestamp,
 				browser_download_url:
-					"https://github.com/elixir-lang/expert/releases/download/nightly/expert_darwin_arm64",
+					"https://github.com/expert-lsp/expert/releases/download/nightly/expert_darwin_arm64",
 			},
 			{
-				url: "https://api.github.com/repos/elixir-lang/expert/releases/assets/319436619",
+				url: "https://api.github.com/repos/expert-lsp/expert/releases/assets/319436619",
 				id: 319436619,
 				node_id: "RA_kwDOMzhD084TCjdL",
 				name: "expert_linux_amd64",
@@ -140,10 +140,10 @@ export function nightlyRelease(updatedAt?: string): GitHubRelease {
 				created_at: timestamp,
 				updated_at: timestamp,
 				browser_download_url:
-					"https://github.com/elixir-lang/expert/releases/download/nightly/expert_linux_amd64",
+					"https://github.com/expert-lsp/expert/releases/download/nightly/expert_linux_amd64",
 			},
 			{
-				url: "https://api.github.com/repos/elixir-lang/expert/releases/assets/319436623",
+				url: "https://api.github.com/repos/expert-lsp/expert/releases/assets/319436623",
 				id: 319436623,
 				node_id: "RA_kwDOMzhD084TCjdP",
 				name: "expert_linux_arm64",
@@ -157,10 +157,10 @@ export function nightlyRelease(updatedAt?: string): GitHubRelease {
 				created_at: timestamp,
 				updated_at: timestamp,
 				browser_download_url:
-					"https://github.com/elixir-lang/expert/releases/download/nightly/expert_linux_arm64",
+					"https://github.com/expert-lsp/expert/releases/download/nightly/expert_linux_arm64",
 			},
 			{
-				url: "https://api.github.com/repos/elixir-lang/expert/releases/assets/319436624",
+				url: "https://api.github.com/repos/expert-lsp/expert/releases/assets/319436624",
 				id: 319436624,
 				node_id: "RA_kwDOMzhD084TCjdQ",
 				name: "expert_windows_amd64.exe",
@@ -174,11 +174,11 @@ export function nightlyRelease(updatedAt?: string): GitHubRelease {
 				created_at: timestamp,
 				updated_at: timestamp,
 				browser_download_url:
-					"https://github.com/elixir-lang/expert/releases/download/nightly/expert_windows_amd64.exe",
+					"https://github.com/expert-lsp/expert/releases/download/nightly/expert_windows_amd64.exe",
 			},
 		],
-		tarball_url: "https://api.github.com/repos/elixir-lang/expert/tarball/nightly",
-		zipball_url: "https://api.github.com/repos/elixir-lang/expert/zipball/nightly",
+		tarball_url: "https://api.github.com/repos/expert-lsp/expert/tarball/nightly",
+		zipball_url: "https://api.github.com/repos/expert-lsp/expert/zipball/nightly",
 		body: null,
 	};
 }

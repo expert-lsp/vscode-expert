@@ -85,10 +85,10 @@ describe("checkAndInstall", () => {
 			const release = GithubFixture.any();
 			const fakeAsset = Buffer.from("fake-binary-content");
 
-			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases/tags/nightly").reply(200, release);
+			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases/tags/nightly").reply(200, release);
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, fakeAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -132,14 +132,14 @@ describe("checkAndInstall", () => {
 			const newAsset = Buffer.from("new-binary-content");
 
 			nock(GITHUB_API)
-				.get("/repos/elixir-lang/expert/releases/tags/nightly")
+				.get("/repos/expert-lsp/expert/releases/tags/nightly")
 				.reply(200, newRelease);
 			nock(GITHUB_API)
-				.get(`/repos/elixir-lang/expert/releases/assets/${CHECKSUMS_ASSET_ID}`)
+				.get(`/repos/expert-lsp/expert/releases/assets/${CHECKSUMS_ASSET_ID}`)
 				.reply(200, checksumsContent(expectedAsset, newAsset));
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, newAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -171,14 +171,14 @@ describe("checkAndInstall", () => {
 			let assetDownloaded = false;
 
 			nock(GITHUB_API)
-				.get("/repos/elixir-lang/expert/releases/tags/nightly")
+				.get("/repos/expert-lsp/expert/releases/tags/nightly")
 				.reply(200, GithubFixture.any());
 			nock(GITHUB_API)
-				.get(`/repos/elixir-lang/expert/releases/assets/${CHECKSUMS_ASSET_ID}`)
+				.get(`/repos/expert-lsp/expert/releases/assets/${CHECKSUMS_ASSET_ID}`)
 				.reply(200, checksumsContent(expectedAsset, existingAsset));
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, () => {
 					assetDownloaded = true;
 					return Buffer.from("should-not-download");
@@ -206,10 +206,10 @@ describe("checkAndInstall", () => {
 			const releases = GithubFixture.multipleReleases();
 			const fakeAsset = Buffer.from("fake-binary-content");
 
-			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases").reply(200, releases);
+			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, releases);
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, fakeAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -241,10 +241,10 @@ describe("checkAndInstall", () => {
 			const releases = GithubFixture.multipleReleases();
 			const newAsset = Buffer.from("new-binary-content");
 
-			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases").reply(200, releases);
+			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, releases);
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, newAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -270,10 +270,10 @@ describe("checkAndInstall", () => {
 			const releases = GithubFixture.multipleReleases();
 			let assetDownloaded = false;
 
-			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases").reply(200, releases);
+			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, releases);
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, () => {
 					assetDownloaded = true;
 					return Buffer.from("should-not-download");
@@ -300,9 +300,9 @@ describe("checkAndInstall", () => {
 
 			const releases = GithubFixture.multipleReleases();
 
-			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases").reply(200, releases);
+			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, releases);
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, newAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -331,10 +331,10 @@ describe("checkAndInstall", () => {
 			];
 			const newAsset = Buffer.from("stable-binary");
 
-			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases").reply(200, releases);
+			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, releases);
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, newAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -353,10 +353,10 @@ describe("checkAndInstall", () => {
 			];
 			const fakeAsset = Buffer.from("rc-binary");
 
-			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases").reply(200, releases);
+			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, releases);
 
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, fakeAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -385,7 +385,7 @@ describe("checkAndInstall", () => {
 			ctx.globalStateStore.set(MANIFEST_KEY, existingManifest);
 
 			nock(GITHUB_API)
-				.get("/repos/elixir-lang/expert/releases/tags/nightly")
+				.get("/repos/expert-lsp/expert/releases/tags/nightly")
 				.replyWithError("network error");
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -413,7 +413,7 @@ describe("checkAndInstall", () => {
 			};
 			ctx.globalStateStore.set(MANIFEST_KEY, existingManifest);
 
-			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases").replyWithError("network error");
+			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").replyWithError("network error");
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
 
@@ -428,10 +428,10 @@ describe("checkAndInstall", () => {
 			const release = GithubFixture.any();
 			const fakeAsset = Buffer.from("fake-binary-content");
 
-			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases").reply(200, []);
-			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases/tags/nightly").reply(200, release);
+			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases").reply(200, []);
+			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases/tags/nightly").reply(200, release);
 			nock(GITHUB_API)
-				.get(/\/repos\/elixir-lang\/expert\/releases\/assets\/\d+/)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
 				.reply(200, fakeAsset);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
@@ -444,7 +444,7 @@ describe("checkAndInstall", () => {
 			mockConfigValues.values["nightly"] = true;
 			const release = GithubFixture.withPlatforms(["fictional_unsupported"]);
 
-			nock(GITHUB_API).get("/repos/elixir-lang/expert/releases/tags/nightly").reply(200, release);
+			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases/tags/nightly").reply(200, release);
 
 			const result = await Installation.checkAndInstall(ctx.context as any);
 
@@ -457,7 +457,7 @@ describe("checkAndInstall", () => {
 			mockWindowMessages.errors.length = 0;
 
 			nock(GITHUB_API)
-				.get("/repos/elixir-lang/expert/releases/tags/nightly")
+				.get("/repos/expert-lsp/expert/releases/tags/nightly")
 				.replyWithError("network error");
 
 			const result = await Installation.checkAndInstall(ctx.context as any);

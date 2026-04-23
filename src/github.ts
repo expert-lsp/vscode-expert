@@ -60,7 +60,7 @@ function getHeaders(authToken?: string): Record<string, string> {
 }
 
 export async function fetchNightlyRelease(authToken?: string): Promise<Release> {
-	const url = "https://api.github.com/repos/elixir-lang/expert/releases/tags/nightly";
+	const url = "https://api.github.com/repos/expert-lsp/expert/releases/tags/nightly";
 
 	const response: Response = await fetch(url, { headers: getHeaders(authToken) }).catch((e) => {
 		const errorMessage = e instanceof Error ? e.message : String(e);
@@ -89,7 +89,7 @@ export async function fetchNightlyRelease(authToken?: string): Promise<Release> 
 }
 
 export async function releases(authToken?: string): Promise<Releases> {
-	const url = "https://api.github.com/repos/elixir-lang/expert/releases";
+	const url = "https://api.github.com/repos/expert-lsp/expert/releases";
 
 	const response: Response = await fetch(url, { headers: getHeaders(authToken) }).catch((e) => {
 		const errorMessage = e instanceof Error ? e.message : String(e);
