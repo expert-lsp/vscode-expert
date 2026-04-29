@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { commands, ExtensionContext, Uri, window, workspace } from "vscode";
+import { commands, ExtensionContext, Uri, window } from "vscode";
 import {
 	LanguageClient,
 	LanguageClientOptions,
@@ -39,10 +39,9 @@ export async function activate(context: ExtensionContext): Promise<LanguageClien
 	);
 
 	const serverOptions = await getServerStartupOptions(context);
-	const projectDir = Configuration.getProjectDirUri(workspace);
 
 	if (serverOptions !== undefined) {
-		client = await start(serverOptions, projectDir);
+		client = await start(serverOptions);
 
 		context.subscriptions.push(
 			commands.registerCommand("expert.server.start", () => Commands.start(client!)),
@@ -69,9 +68,7 @@ export function deactivate() {
 	return client.stop();
 }
 
-async function start(serverOptions: ServerOptions, workspaceUri: Uri): Promise<LanguageClient> {
-	Logger.info(`Starting Expert in workspace ${workspaceUri?.fsPath}`);
-
+async function start(serverOptions: ServerOptions): Promise<LanguageClient> {
 	let lspClient!: LanguageClient;
 
 	const clientOptions: LanguageClientOptions = {
@@ -102,11 +99,6 @@ async function start(serverOptions: ServerOptions, workspaceUri: Uri): Promise<L
 			{ language: "phoenix-heex", scheme: "untitled" },
 		],
 		progressOnInitialization: true,
-		workspaceFolder: {
-			index: 0,
-			uri: workspaceUri,
-			name: workspaceUri.path,
-		},
 	};
 
 	const client = new LanguageClient("expert", "Expert", serverOptions, clientOptions);

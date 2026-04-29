@@ -1,6 +1,4 @@
-import path = require("path");
-
-import { ConfigurationTarget, Uri, workspace as vsWorkspace } from "vscode";
+import { ConfigurationTarget, workspace as vsWorkspace } from "vscode";
 import * as Logger from "./logger";
 
 // wrapped in functions b/c getConfiguration needs to be called late
@@ -32,30 +30,21 @@ export function getWorkspaceSymbolsMinQueryLength() {
 	return getBaseConfig().get<number>("workspaceSymbols.minQueryLength", 2);
 }
 
+export function getProjectDir(): string | undefined {
+	return getBaseConfig().get<string>("projectDir");
+}
+
 export function getServerSettings() {
 	const fileLogLevel = getFileLogLevel();
 
 	return {
 		logLevel: getLogLevel(),
 		fileLogLevel: fileLogLevel === "default" ? null : fileLogLevel,
+		projectDir: getProjectDir(),
 		workspaceSymbols: {
 			minQueryLength: getWorkspaceSymbolsMinQueryLength(),
 		},
 	};
-}
-
-export function getProjectDirUri(workspace: typeof vsWorkspace): Uri {
-	const projectDirConfig = getBaseConfig().get<string>("projectDir");
-
-	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	const workspacePath = workspace.workspaceFolders![0].uri.path;
-
-	if (typeof projectDirConfig === "string") {
-		const fullDirectoryPath = path.join(workspacePath, projectDirConfig);
-		return Uri.file(fullDirectoryPath);
-	}
-
-	return Uri.file(workspacePath);
 }
 
 export function disableAutoInstallUpdateNotification(): void {
