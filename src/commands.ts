@@ -1,6 +1,17 @@
+import { window } from "vscode";
 import { ExecuteCommandRequest, type LanguageClient } from "vscode-languageclient/node";
 import * as Auth from "./auth";
 import * as Logger from "./logger";
+
+interface ConnectionDetails {
+	nodeName: string;
+	port: number;
+	cookie: string;
+	epmdModule: string;
+	epmdEbinPath: string;
+	remoteShellScriptPath: string;
+	command: string;
+}
 
 export function start(client: LanguageClient) {
 	if (client.isRunning()) {
@@ -44,4 +55,25 @@ export async function login(): Promise<void> {
 
 export async function logout(): Promise<void> {
 	await Auth.logout();
+}
+
+export async function remoteShell(client: LanguageClient): Promise<void> {
+	if (!client.isRunning()) {
+		Logger.error("Client is not running, cannot open remote shell.");
+		return;
+	}
+
+	const result = await client.sendRequest(ExecuteCommandRequest.type, {
+		command: "connectionDetails",
+		arguments: [],
+	});
+
+	const details = result as ConnectionDetails;
+
+	const terminal = window.createTerminal({
+		name: `Expert Remote Shell (${details.nodeName})`,
+	});
+
+	terminal.sendText(details.command, true);
+	terminal.show();
 }
