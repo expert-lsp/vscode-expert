@@ -1,6 +1,12 @@
 export const mockConfigValues: { values: Record<string, unknown> };
 export const mockUpdateCalls: { calls: Array<{ key: string; value: unknown; target: number }> };
 export const mockWindowMessages: { errors: unknown[][]; info: unknown[][] };
+export const mockQuickPick: {
+	nextValue: unknown;
+	calls: Array<{ items: unknown[]; options: unknown }>;
+};
+export const mockWarningMessage: { nextResponse: string | undefined };
+export const mockClipboard: { writes: string[] };
 export const ConfigurationTarget: { Global: 1; Workspace: 2; WorkspaceFolder: 3 };
 
 interface MockUri {

@@ -1,5 +1,4 @@
 // biome-ignore-all lint/suspicious/noEmptyBlockStatements: mocks void functions
-// biome-ignore-all lint/suspicious/noExplicitAny: mocks as any
 
 // Mock vscode module for tests
 import path from "node:path";
@@ -71,6 +70,13 @@ export const window = {
 		mockWindowMessages.info.push(args);
 		return Promise.resolve(undefined);
 	},
+	showWarningMessage: () => Promise.resolve(mockWarningMessage.nextResponse),
+	showQuickPick: async (items, options) => {
+		mockQuickPick.calls.push({ items, options });
+		const result = mockQuickPick.nextValue;
+		mockQuickPick.nextValue = undefined;
+		return result;
+	},
 	createOutputChannel: () => ({
 		append: () => {},
 		appendLine: () => {},
@@ -86,6 +92,18 @@ export const window = {
 	}),
 };
 
+export const env = {
+	clipboard: {
+		writeText: async (text) => {
+			mockClipboard.writes.push(text);
+		},
+	},
+};
+
+export const authentication = {
+	getSession: async () => undefined,
+};
+
 export const l10n = {
 	t: (message) => message,
 };
@@ -99,6 +117,20 @@ export const mockUpdateCalls = { calls: [] };
 
 // Track window message calls for assertions
 export const mockWindowMessages = { errors: [], info: [] };
+
+// Control state for interactive window mocks
+export const mockQuickPick = {
+	nextValue: undefined,
+	calls: [],
+};
+
+export const mockWarningMessage = {
+	nextResponse: "Delete",
+};
+
+export const mockClipboard = {
+	writes: [],
+};
 
 export const workspace = {
 	getConfiguration: () => {
