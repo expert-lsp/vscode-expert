@@ -1,5 +1,6 @@
 import * as fs from "fs";
-import { commands, ExtensionContext, Uri, window } from "vscode";
+import * as path from "path";
+import { commands, ExtensionContext, Uri, window, workspace } from "vscode";
 import {
 	LanguageClient,
 	LanguageClientOptions,
@@ -11,6 +12,7 @@ import * as Commands from "./commands";
 import * as Configuration from "./configuration";
 import { checkAndInstall, checkForUpdates } from "./installation";
 import * as Logger from "./logger";
+import { type EnvResult, resolveEnv } from "./versionManagers/versionManager";
 
 let client: LanguageClient | undefined;
 
@@ -114,6 +116,27 @@ async function start(serverOptions: ServerOptions): Promise<LanguageClient> {
 	return client;
 }
 
+function buildEnv(envResult: EnvResult): NodeJS.ProcessEnv {
+	const env = { ...process.env };
+
+	if (envResult.detected !== true) {
+		return env;
+	}
+
+	const dirs = [envResult.env.elixirDir, envResult.env.erlangDir].filter(
+		(dir): dir is string => dir !== undefined,
+	);
+	const uniqueDirs = [...new Set(dirs)];
+
+	if (uniqueDirs.length > 0) {
+		const prepend = uniqueDirs.join(path.delimiter);
+		env.PATH = `${prepend}${path.delimiter}${env.PATH ?? ""}`;
+		Logger.info(`Prepending to PATH: ${prepend}`);
+	}
+
+	return env;
+}
+
 function ensureDirectoryExists(directory: Uri) {
 	if (!fs.existsSync(directory.fsPath)) {
 		fs.mkdirSync(directory.fsPath, { recursive: true });
@@ -154,11 +177,26 @@ async function getServerStartupOptions(
 		};
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	const envResult = await resolveEnv(
+		Configuration.getVersionManager(),
+		workspace.workspaceFolders![0],
+		context,
+	);
+
+	if (envResult.detected === "error") {
+		Logger.error(envResult.message);
+		window.showErrorMessage(`Expert: ${envResult.message}`);
+		return undefined;
+	}
+
+	const env = buildEnv(envResult);
+
 	const releasePathOverride = Configuration.getReleasePathOverride();
 
 	if (typeof releasePathOverride === "string" && releasePathOverride.length > 0) {
 		Logger.info(`starting language server from release override: "${releasePathOverride}".`);
-		return { command: releasePathOverride, args };
+		return { command: releasePathOverride, args, options: { env } };
 	}
 
 	const languageServerPath = await checkAndInstall(context);
@@ -168,5 +206,5 @@ async function getServerStartupOptions(
 
 	Logger.info(`Expert Language Server:\n${languageServerPath} ${args.join(" ")}`);
 
-	return { command: languageServerPath, args };
+	return { command: languageServerPath, args, options: { env } };
 }

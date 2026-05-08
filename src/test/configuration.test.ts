@@ -160,4 +160,15 @@ describe("Configuration", () => {
 			});
 		});
 	});
+
+	describe("getVersionManager", () => {
+		it("returns 'auto' by default when not configured", () => {
+			assert.strictEqual(Configuration.getVersionManager(), "auto");
+		});
+
+		it("returns 'mise' when explicitly set", () => {
+			mockConfigValues.values = { versionManager: "mise" };
+			assert.strictEqual(Configuration.getVersionManager(), "mise");
+		});
+	});
 });
