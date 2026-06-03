@@ -1,5 +1,18 @@
 # Change Log
 
+## [0.6.0](https://github.com/expert-lsp/vscode-expert/compare/v0.5.0...v0.6.0) (2026-06-03)
+
+
+### Features
+
+* add remote shell ([#42](https://github.com/expert-lsp/vscode-expert/issues/42)) ([737aba2](https://github.com/expert-lsp/vscode-expert/commit/737aba29b15cf0e50ed197e044f3e7723497d2b6))
+* add specific support for asdf and mise ([#36](https://github.com/expert-lsp/vscode-expert/issues/36)) ([4721f14](https://github.com/expert-lsp/vscode-expert/commit/4721f1409ca3cf59810010a431961d87c012f551))
+
+
+### Bug Fixes
+
+* support workspace folders ([#40](https://github.com/expert-lsp/vscode-expert/issues/40)) ([3424785](https://github.com/expert-lsp/vscode-expert/commit/34247855857b3c5a24ece990c5b8836d9082708c))
+
 ## [0.5.0](https://github.com/expert-lsp/vscode-expert/compare/v0.4.0...v0.5.0) (2026-04-23)
 
 
