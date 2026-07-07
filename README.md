@@ -42,6 +42,9 @@ Alternatively, you may opt to build Expert from source and point this extension 
 
 Tells the extension to use a local release of the Expert language server instead of the automatically installed one. This path should point to Expert's executable, typically located at `/path/to/expert/apps/expert/burrito_out/expert_darwin_arm64`.
 
+### expert.server.elixirSourcePath
+
+Path to a local Elixir source directory; absolute paths are recommended. This is not supported in Expert 0.1.
 
 ### expert.notifyOnServerAutoUpdate
 

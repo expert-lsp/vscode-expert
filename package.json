@@ -165,6 +165,11 @@
           "type": "string",
           "markdownDescription": "A subdirectory of the current workspace in which to start Expert."
         },
+        "expert.server.elixirSourcePath": {
+          "scope": "window",
+          "type": "string",
+          "markdownDescription": "Path to a local Elixir source directory; absolute paths are recommended. Not supported by Expert 0.1"
+        },
         "expert.server.versionManager": {
           "scope": "window",
           "type": "string",

@@ -34,6 +34,10 @@ export function getProjectDir(): string | undefined {
 	return getBaseConfig().get<string>("projectDir");
 }
 
+export function getElixirSourcePath(): string | undefined {
+	return getBaseConfig().get<string>("elixirSourcePath");
+}
+
 export function getServerSettings() {
 	const fileLogLevel = getFileLogLevel();
 
@@ -41,6 +45,7 @@ export function getServerSettings() {
 		logLevel: getLogLevel(),
 		fileLogLevel: fileLogLevel === "default" ? null : fileLogLevel,
 		projectDir: getProjectDir(),
+		elixirSourcePath: getElixirSourcePath(),
 		workspaceSymbols: {
 			minQueryLength: getWorkspaceSymbolsMinQueryLength(),
 		},

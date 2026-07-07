@@ -101,12 +101,24 @@ describe("Configuration", () => {
 		});
 	});
 
+	describe("getElixirSourcePath", () => {
+		it("returns undefined by default when not configured", () => {
+			assert.strictEqual(Configuration.getElixirSourcePath(), undefined);
+		});
+
+		it("returns the configured Elixir source path", () => {
+			mockConfigValues.values = { elixirSourcePath: "/path/to/elixir" };
+			assert.strictEqual(Configuration.getElixirSourcePath(), "/path/to/elixir");
+		});
+	});
+
 	describe("getServerSettings", () => {
 		it("returns defaults when nothing is configured", () => {
 			assert.deepStrictEqual(Configuration.getServerSettings(), {
 				logLevel: "info",
 				fileLogLevel: null,
 				projectDir: undefined,
+				elixirSourcePath: undefined,
 				workspaceSymbols: { minQueryLength: 2 },
 			});
 		});
@@ -126,12 +138,14 @@ describe("Configuration", () => {
 				logLevel: "warning",
 				fileLogLevel: "error",
 				projectDir: "apps/my_app",
+				elixirSourcePath: "./elixir",
 				"workspaceSymbols.minQueryLength": 5,
 			};
 			assert.deepStrictEqual(Configuration.getServerSettings(), {
 				logLevel: "warning",
 				fileLogLevel: "error",
 				projectDir: "apps/my_app",
+				elixirSourcePath: "./elixir",
 				workspaceSymbols: { minQueryLength: 5 },
 			});
 		});
