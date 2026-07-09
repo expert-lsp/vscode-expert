@@ -168,7 +168,7 @@
         "expert.server.elixirSourcePath": {
           "scope": "window",
           "type": "string",
-          "markdownDescription": "Path to a local Elixir source directory; absolute paths are recommended. Not supported by Expert 0.1"
+          "markdownDescription": "Path to a local Elixir source directory; absolute paths are recommended.. When set, go-to-definition on Elixir standard library modules will navigate to source files in this directory instead of returning no result."
         },
         "expert.server.versionManager": {
           "scope": "window",
