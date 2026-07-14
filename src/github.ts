@@ -51,7 +51,7 @@ export const GITHUB_HEADERS = {
 	"X-GitHub-Api-Version": "2022-11-28",
 };
 
-function getHeaders(authToken?: string): Record<string, string> {
+export function getHeaders(authToken?: string): Record<string, string> {
 	const headers: Record<string, string> = { ...GITHUB_HEADERS };
 	if (authToken) {
 		headers.Authorization = `Bearer ${authToken}`;

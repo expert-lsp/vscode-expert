@@ -1,13 +1,14 @@
 import { createHash } from "crypto";
 import * as fs from "fs";
 import { ExtensionContext, Uri, window } from "vscode";
+import * as Auth from "./auth";
 import * as Configuration from "./configuration";
 import {
 	Asset,
 	fetchNightlyRelease,
 	fetchStableRelease,
-	GITHUB_HEADERS,
 	Release as GitHubRelease,
+	getHeaders,
 	shouldAutoUpgradeFromRC,
 } from "./github";
 import * as Logger from "./logger";
@@ -43,6 +44,7 @@ export async function checkAndInstall(
 	context: ExtensionContext,
 	attemptCount: number = 0,
 ): Promise<string | undefined> {
+	await Auth.initialize();
 	const nightly = Configuration.getNightly();
 
 	// Delete the legacy manifest key
@@ -111,7 +113,7 @@ async function mustInstallLatest(
 }
 
 async function mustInstallNightly(context: ExtensionContext): Promise<string | undefined> {
-	const nightlyRelease = await fetchNightlyRelease();
+	const nightlyRelease = await fetchNightlyRelease(Auth.getAccessToken());
 
 	const asset = findDistribution(nightlyRelease);
 
@@ -134,7 +136,7 @@ async function mustInstallNightly(context: ExtensionContext): Promise<string | u
 }
 
 async function mustInstallStable(context: ExtensionContext): Promise<string | undefined> {
-	const stableRelease = await fetchStableRelease();
+	const stableRelease = await fetchStableRelease(Auth.getAccessToken());
 
 	if (stableRelease === null) {
 		Logger.info("No stable release found, installing nightly release instead...");
@@ -178,7 +180,7 @@ async function compareAndInstallNightly(
 	manifest: Manifest,
 ): Promise<string | undefined> {
 	Logger.info("Checking for nightly updates...");
-	const nightlyRelease = await fetchNightlyRelease();
+	const nightlyRelease = await fetchNightlyRelease(Auth.getAccessToken());
 	const asset = findDistribution(nightlyRelease);
 
 	if (asset === undefined) {
@@ -248,7 +250,7 @@ async function compareAndInstallStable(
 	manifest: Manifest,
 ): Promise<string | undefined> {
 	Logger.info("Checking for stable updates...");
-	const stableRelease = await fetchStableRelease();
+	const stableRelease = await fetchStableRelease(Auth.getAccessToken());
 
 	if (stableRelease === null) {
 		Logger.info("No stable release found, checking for nightly updates instead...");
@@ -309,7 +311,7 @@ function findDistribution(release: GitHubRelease) {
 async function download(asset: Asset, context: ExtensionContext) {
 	const res: Response = await fetch(asset.url, {
 		headers: {
-			...GITHUB_HEADERS,
+			...getHeaders(Auth.getAccessToken()),
 			Accept: "application/octet-stream",
 		},
 	}).catch((e) => {
@@ -344,7 +346,7 @@ async function download(asset: Asset, context: ExtensionContext) {
 async function fetchChecksumsText(asset: Asset): Promise<string> {
 	const res: Response = await fetch(asset.url, {
 		headers: {
-			...GITHUB_HEADERS,
+			...getHeaders(Auth.getAccessToken()),
 			Accept: "application/octet-stream",
 		},
 	}).catch((e) => {

@@ -94,6 +94,15 @@ export const commands = {
 	registerCommand: () => ({ dispose: () => {} }),
 };
 
+export const mockAuthentication = { session: undefined, calls: [] };
+
+export const authentication = {
+	getSession: (providerId, scopes, options) => {
+		mockAuthentication.calls.push({ providerId, scopes, options });
+		return Promise.resolve(mockAuthentication.session);
+	},
+};
+
 // Track update calls for assertions
 export const mockUpdateCalls = { calls: [] };
 

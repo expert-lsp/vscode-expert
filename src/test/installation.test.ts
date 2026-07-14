@@ -10,7 +10,7 @@ import nock from "nock";
 import { getManifestKey, type Manifest } from "../installation";
 import { getExpectedAssetName } from "../platform";
 import * as GithubFixture from "./fixtures/github-fixture";
-import { mockConfigValues, mockWindowMessages } from "./vscode-mock.mjs";
+import { mockAuthentication, mockConfigValues, mockWindowMessages } from "./vscode-mock.mjs";
 
 const GITHUB_API = "https://api.github.com";
 const CHECKSUMS_ASSET_ID = 319436622;
@@ -74,12 +74,54 @@ describe("checkAndInstall", () => {
 	beforeEach(() => {
 		ctx = createTestContext();
 		nock.cleanAll();
+		mockAuthentication.session = undefined;
+		mockAuthentication.calls.length = 0;
 		mockConfigValues.values["nightly"] = true;
 	});
 
 	afterEach(() => cleanupTestContext(ctx));
 
 	describe("nightly channel", () => {
+		it("authenticates release, checksum, and binary requests", async () => {
+			const expectedAsset = getExpectedAssetName();
+			const oldAsset = Buffer.from("old-binary");
+			const newAsset = Buffer.from("new-binary");
+			const authorization = "Bearer github-token";
+
+			fs.writeFileSync(path.join(ctx.tempDir, expectedAsset), oldAsset);
+			ctx.globalStateStore.set(MANIFEST_KEY, {
+				name: expectedAsset,
+				version: "nightly",
+				asset_timestamp: new Date("2025-11-20T00:00:00Z"),
+				release_timestamp: new Date("2025-11-20T00:00:00Z"),
+			});
+			mockAuthentication.session = {
+				accessToken: "github-token",
+				account: { id: "1", label: "octocat" },
+				id: "session-1",
+				scopes: ["repo"],
+			};
+
+			nock(GITHUB_API)
+				.get("/repos/expert-lsp/expert/releases/tags/nightly")
+				.matchHeader("authorization", authorization)
+				.reply(200, GithubFixture.nightlyRelease("2025-11-22T00:24:06Z"));
+			nock(GITHUB_API)
+				.get(`/repos/expert-lsp/expert/releases/assets/${CHECKSUMS_ASSET_ID}`)
+				.matchHeader("authorization", authorization)
+				.reply(200, checksumsContent(expectedAsset, newAsset));
+			nock(GITHUB_API)
+				.get(/\/repos\/expert-lsp\/expert\/releases\/assets\/\d+/)
+				.matchHeader("authorization", authorization)
+				.reply(200, newAsset);
+
+			const result = await Installation.checkAndInstall(ctx.context as any);
+
+			assert.ok(result);
+			assert.deepStrictEqual(fs.readFileSync(result), newAsset);
+			assert.ok(nock.isDone(), `Unmatched requests: ${nock.pendingMocks().join(", ")}`);
+		});
+
 		it("installs the latest nightly when no prior version exists", async () => {
 			const expectedAsset = getExpectedAssetName();
 			const release = GithubFixture.any();
@@ -131,9 +173,7 @@ describe("checkAndInstall", () => {
 			const newRelease = GithubFixture.nightlyRelease("2025-11-22T00:24:06Z");
 			const newAsset = Buffer.from("new-binary-content");
 
-			nock(GITHUB_API)
-				.get("/repos/expert-lsp/expert/releases/tags/nightly")
-				.reply(200, newRelease);
+			nock(GITHUB_API).get("/repos/expert-lsp/expert/releases/tags/nightly").reply(200, newRelease);
 			nock(GITHUB_API)
 				.get(`/repos/expert-lsp/expert/releases/assets/${CHECKSUMS_ASSET_ID}`)
 				.reply(200, checksumsContent(expectedAsset, newAsset));

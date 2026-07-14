@@ -3,6 +3,7 @@
 
 import assert from "node:assert";
 import { before, beforeEach, describe, it, mock } from "node:test";
+import { mockAuthentication } from "./vscode-mock.mjs";
 
 // Track calls to key functions
 let checkAndInstallCalled = false;
@@ -64,7 +65,10 @@ describe("Extension activation with configuration", () => {
 				getReleasePathOverride: () => configValues.releasePathOverride,
 				getStartupFlagsOverride: () => configValues.startupFlagsOverride,
 				getProjectDir: () => configValues.projectDir,
-				getServerSettings: () => ({ logLevel: configValues.logLevel ?? "info", projectDir: configValues.projectDir }),
+				getServerSettings: () => ({
+					logLevel: configValues.logLevel ?? "info",
+					projectDir: configValues.projectDir,
+				}),
 				getVersionManager: () => configValues.versionManager ?? "none",
 			},
 		});
@@ -75,6 +79,8 @@ describe("Extension activation with configuration", () => {
 		languageClientCreated = false;
 		languageClientArgs = undefined;
 		languageClientServerOptions = undefined;
+		mockAuthentication.session = undefined;
+		mockAuthentication.calls.length = 0;
 		configValues = {};
 	});
 
@@ -112,6 +118,11 @@ describe("Extension activation with configuration", () => {
 				"checkAndInstall should not be called with override",
 			);
 			assert.strictEqual(languageClientCreated, true, "LanguageClient should be created");
+			assert.strictEqual(
+				mockAuthentication.calls.length,
+				0,
+				"GitHub authentication should not initialize with a release override",
+			);
 		});
 	});
 

@@ -1,6 +1,17 @@
 export const mockConfigValues: { values: Record<string, unknown> };
 export const mockUpdateCalls: { calls: Array<{ key: string; value: unknown; target: number }> };
 export const mockWindowMessages: { errors: unknown[][]; info: unknown[][] };
+export const mockAuthentication: {
+	session:
+		| {
+				accessToken: string;
+				account: { id: string; label: string };
+				id: string;
+				scopes: string[];
+		  }
+		| undefined;
+	calls: Array<{ providerId: string; scopes: string[]; options: Record<string, boolean> }>;
+};
 export const ConfigurationTarget: { Global: 1; Workspace: 2; WorkspaceFolder: 3 };
 
 interface MockUri {

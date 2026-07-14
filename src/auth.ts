@@ -9,7 +9,7 @@ let currentSession: AuthenticationSession | undefined;
 export async function initialize(): Promise<void> {
 	try {
 		currentSession = await authentication.getSession(GITHUB_AUTH_PROVIDER_ID, GITHUB_AUTH_SCOPES, {
-			createIfNone: false,
+			silent: true,
 		});
 		if (currentSession) {
 			Logger.info(`GitHub authentication initialized for ${currentSession.account.label}`);
@@ -17,6 +17,10 @@ export async function initialize(): Promise<void> {
 	} catch (error) {
 		Logger.warn(`Failed to initialize GitHub authentication: ${error}`);
 	}
+}
+
+export function getAccessToken(): string | undefined {
+	return currentSession?.accessToken;
 }
 
 export async function login(): Promise<boolean> {

@@ -7,7 +7,6 @@ import {
 	ServerOptions,
 	StreamInfo,
 } from "vscode-languageclient/node";
-import * as Auth from "./auth";
 import * as Commands from "./commands";
 import * as Configuration from "./configuration";
 import { checkAndInstall, checkForUpdates } from "./installation";
@@ -31,8 +30,6 @@ export async function activate(context: ExtensionContext): Promise<LanguageClien
 	}
 
 	ensureDirectoryExists(context.globalStorageUri);
-
-	await Auth.initialize();
 
 	context.subscriptions.push(
 		commands.registerCommand("expert.server.checkForUpdates", () => checkForUpdates(context)),
