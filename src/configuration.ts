@@ -38,6 +38,10 @@ export function getElixirSourcePath(): string | undefined {
 	return getBaseConfig().get<string>("elixirSourcePath");
 }
 
+export function getCompileOnType(): boolean {
+	return getBaseConfig().get<boolean>("compileOnType", true);
+}
+
 export function getServerSettings() {
 	const fileLogLevel = getFileLogLevel();
 
@@ -46,6 +50,7 @@ export function getServerSettings() {
 		fileLogLevel: fileLogLevel === "default" ? null : fileLogLevel,
 		projectDir: getProjectDir(),
 		elixirSourcePath: getElixirSourcePath(),
+		compileOnType: getCompileOnType(),
 		workspaceSymbols: {
 			minQueryLength: getWorkspaceSymbolsMinQueryLength(),
 		},
