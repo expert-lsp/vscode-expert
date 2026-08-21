@@ -50,6 +50,10 @@ Path to a local Elixir source directory; absolute paths are recommended.. When s
 
 Compiles open Elixir documents after each change to provide file-level diagnostics. Disable this to avoid transient compiler diagnostics while typing. Defaults to `true`.
 
+### expert.server.autoFetchDependencies
+
+Automatically runs `mix deps.get` when project startup fails because dependencies are missing or stale. Disable this to have Expert ask before fetching dependencies. Defaults to `true`.
+
 ### expert.notifyOnServerAutoUpdate
 
 Controls whether notifications are shown after automatic installs of new Expert versions. Defaults to `true`.

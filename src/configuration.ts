@@ -42,6 +42,10 @@ export function getCompileOnType(): boolean {
 	return getBaseConfig().get<boolean>("compileOnType", true);
 }
 
+export function getAutoFetchDependencies(): boolean {
+	return getBaseConfig().get<boolean>("autoFetchDependencies", true);
+}
+
 export function getServerSettings() {
 	const fileLogLevel = getFileLogLevel();
 
@@ -51,6 +55,7 @@ export function getServerSettings() {
 		projectDir: getProjectDir(),
 		elixirSourcePath: getElixirSourcePath(),
 		compileOnType: getCompileOnType(),
+		autoFetchDependencies: getAutoFetchDependencies(),
 		workspaceSymbols: {
 			minQueryLength: getWorkspaceSymbolsMinQueryLength(),
 		},

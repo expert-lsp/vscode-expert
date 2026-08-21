@@ -76,6 +76,7 @@ describe("Extension activation with configuration", () => {
 					logLevel: configValues.logLevel ?? "info",
 					projectDir: configValues.projectDir,
 					compileOnType: configValues.compileOnType ?? true,
+					autoFetchDependencies: configValues.autoFetchDependencies ?? true,
 				}),
 				getVersionManager: () => configValues.versionManager ?? "none",
 			},
@@ -223,6 +224,42 @@ describe("Extension activation with configuration", () => {
 							logLevel: "info",
 							projectDir: undefined,
 							compileOnType: true,
+							autoFetchDependencies: true,
+						},
+					},
+				},
+			]);
+		});
+	});
+
+	describe("when expert.server.autoFetchDependencies changes", () => {
+		it("sends the setting during initialization and configuration changes", async () => {
+			configValues = {
+				enabled: true,
+				releasePathOverride: "/server/path",
+				autoFetchDependencies: false,
+			};
+
+			const { activate } = await import("../extension");
+			await activate({
+				globalStorageUri: { fsPath: "/test/storage" },
+				subscriptions: [],
+			} as any);
+
+			assert.strictEqual(languageClientOptions.initializationOptions.autoFetchDependencies, false);
+
+			configValues.autoFetchDependencies = true;
+			await languageClientOptions.middleware.workspace.didChangeConfiguration([], () => {});
+
+			assert.deepStrictEqual(sentNotifications, [
+				{
+					method: "workspace/didChangeConfiguration",
+					params: {
+						settings: {
+							logLevel: "info",
+							projectDir: undefined,
+							compileOnType: true,
+							autoFetchDependencies: true,
 						},
 					},
 				},

@@ -123,6 +123,17 @@ describe("Configuration", () => {
 		});
 	});
 
+	describe("getAutoFetchDependencies", () => {
+		it("returns true by default when not configured", () => {
+			assert.strictEqual(Configuration.getAutoFetchDependencies(), true);
+		});
+
+		it("returns false when explicitly disabled", () => {
+			mockConfigValues.values = { autoFetchDependencies: false };
+			assert.strictEqual(Configuration.getAutoFetchDependencies(), false);
+		});
+	});
+
 	describe("getServerSettings", () => {
 		it("returns defaults when nothing is configured", () => {
 			assert.deepStrictEqual(Configuration.getServerSettings(), {
@@ -131,6 +142,7 @@ describe("Configuration", () => {
 				projectDir: undefined,
 				elixirSourcePath: undefined,
 				compileOnType: true,
+				autoFetchDependencies: true,
 				workspaceSymbols: { minQueryLength: 2 },
 			});
 		});
@@ -152,6 +164,7 @@ describe("Configuration", () => {
 				projectDir: "apps/my_app",
 				elixirSourcePath: "./elixir",
 				compileOnType: false,
+				autoFetchDependencies: false,
 				"workspaceSymbols.minQueryLength": 5,
 			};
 			assert.deepStrictEqual(Configuration.getServerSettings(), {
@@ -160,6 +173,7 @@ describe("Configuration", () => {
 				projectDir: "apps/my_app",
 				elixirSourcePath: "./elixir",
 				compileOnType: false,
+				autoFetchDependencies: false,
 				workspaceSymbols: { minQueryLength: 5 },
 			});
 		});
