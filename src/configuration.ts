@@ -38,8 +38,20 @@ export function getElixirSourcePath(): string | undefined {
 	return getBaseConfig().get<string>("elixirSourcePath");
 }
 
+export function getElixirExecutablePath(): string | null {
+	return getBaseConfig().get<string | null>("elixirExecutablePath", null);
+}
+
+export function getErlangExecutablePath(): string | null {
+	return getBaseConfig().get<string | null>("erlangExecutablePath", null);
+}
+
 export function getCompileOnType(): boolean {
 	return getBaseConfig().get<boolean>("compileOnType", true);
+}
+
+export function getAutoFetchDependencies(): boolean {
+	return getBaseConfig().get<boolean>("autoFetchDependencies", true);
 }
 
 export function getServerSettings() {
@@ -50,7 +62,10 @@ export function getServerSettings() {
 		fileLogLevel: fileLogLevel === "default" ? null : fileLogLevel,
 		projectDir: getProjectDir(),
 		elixirSourcePath: getElixirSourcePath(),
+		elixirExecutablePath: getElixirExecutablePath(),
+		erlangExecutablePath: getErlangExecutablePath(),
 		compileOnType: getCompileOnType(),
+		autoFetchDependencies: getAutoFetchDependencies(),
 		workspaceSymbols: {
 			minQueryLength: getWorkspaceSymbolsMinQueryLength(),
 		},

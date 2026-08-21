@@ -170,11 +170,27 @@
           "type": "string",
           "markdownDescription": "Path to a local Elixir source directory; absolute paths are recommended.. When set, go-to-definition on Elixir standard library modules will navigate to source files in this directory instead of returning no result."
         },
+        "expert.server.elixirExecutablePath": {
+          "scope": "window",
+          "type": "string",
+          "markdownDescription": "Path to the Elixir executable Expert should use for project engines."
+        },
+        "expert.server.erlangExecutablePath": {
+          "scope": "window",
+          "type": "string",
+          "markdownDescription": "Path to the Erlang `erl` executable Expert should use for project runtimes."
+        },
         "expert.server.compileOnType": {
           "scope": "window",
           "type": "boolean",
           "default": true,
           "markdownDescription": "Compile open Elixir documents after each change to provide file-level diagnostics. Disable this to avoid transient compiler diagnostics while typing."
+        },
+        "expert.server.autoFetchDependencies": {
+          "scope": "window",
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Automatically run `mix deps.get` when project startup fails because dependencies are missing or stale. Disable this to have Expert ask before fetching dependencies."
         },
         "expert.server.versionManager": {
           "scope": "window",
