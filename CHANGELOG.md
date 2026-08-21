@@ -1,5 +1,18 @@
 # Change Log
 
+## [0.7.0](https://github.com/expert-lsp/vscode-expert/compare/v0.6.0...v0.7.0) (2026-08-21)
+
+
+### Features
+
+* add autoFetchDependencies and elixir/erlang path options ([#57](https://github.com/expert-lsp/vscode-expert/issues/57)) ([9c187cd](https://github.com/expert-lsp/vscode-expert/commit/9c187cd705e70ac3d89ecd2e37bd5bb5757b3cf8))
+* add compileOnType configuration ([#56](https://github.com/expert-lsp/vscode-expert/issues/56)) ([07349b1](https://github.com/expert-lsp/vscode-expert/commit/07349b121634abb0c1d2a81b4a877f21c88c5d4b))
+
+
+### Bug Fixes
+
+* don't automatically ask for github authentication ([#52](https://github.com/expert-lsp/vscode-expert/issues/52)) ([005684a](https://github.com/expert-lsp/vscode-expert/commit/005684af6bef07310fc85b090706a3265c47875e))
+
 ## [0.6.0](https://github.com/expert-lsp/vscode-expert/compare/v0.5.0...v0.6.0) (2026-07-09)
 
 
