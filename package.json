@@ -170,6 +170,16 @@
           "type": "string",
           "markdownDescription": "Path to a local Elixir source directory; absolute paths are recommended.. When set, go-to-definition on Elixir standard library modules will navigate to source files in this directory instead of returning no result."
         },
+        "expert.server.elixirExecutablePath": {
+          "scope": "window",
+          "type": "string",
+          "markdownDescription": "Path to the Elixir executable Expert should use for project engines."
+        },
+        "expert.server.erlangExecutablePath": {
+          "scope": "window",
+          "type": "string",
+          "markdownDescription": "Path to the Erlang `erl` executable Expert should use for project runtimes."
+        },
         "expert.server.compileOnType": {
           "scope": "window",
           "type": "boolean",

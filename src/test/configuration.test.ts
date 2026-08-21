@@ -112,6 +112,23 @@ describe("Configuration", () => {
 		});
 	});
 
+	describe("runtime executable paths", () => {
+		it("returns null by default", () => {
+			assert.strictEqual(Configuration.getElixirExecutablePath(), null);
+			assert.strictEqual(Configuration.getErlangExecutablePath(), null);
+		});
+
+		it("returns the configured paths", () => {
+			mockConfigValues.values = {
+				elixirExecutablePath: "/opt/elixir/bin/elixir",
+				erlangExecutablePath: "/opt/erlang/bin/erl",
+			};
+
+			assert.strictEqual(Configuration.getElixirExecutablePath(), "/opt/elixir/bin/elixir");
+			assert.strictEqual(Configuration.getErlangExecutablePath(), "/opt/erlang/bin/erl");
+		});
+	});
+
 	describe("getCompileOnType", () => {
 		it("returns true by default when not configured", () => {
 			assert.strictEqual(Configuration.getCompileOnType(), true);
@@ -141,6 +158,8 @@ describe("Configuration", () => {
 				fileLogLevel: null,
 				projectDir: undefined,
 				elixirSourcePath: undefined,
+				elixirExecutablePath: null,
+				erlangExecutablePath: null,
 				compileOnType: true,
 				autoFetchDependencies: true,
 				workspaceSymbols: { minQueryLength: 2 },
@@ -163,6 +182,8 @@ describe("Configuration", () => {
 				fileLogLevel: "error",
 				projectDir: "apps/my_app",
 				elixirSourcePath: "./elixir",
+				elixirExecutablePath: "/opt/elixir/bin/elixir",
+				erlangExecutablePath: "/opt/erlang/bin/erl",
 				compileOnType: false,
 				autoFetchDependencies: false,
 				"workspaceSymbols.minQueryLength": 5,
@@ -172,6 +193,8 @@ describe("Configuration", () => {
 				fileLogLevel: "error",
 				projectDir: "apps/my_app",
 				elixirSourcePath: "./elixir",
+				elixirExecutablePath: "/opt/elixir/bin/elixir",
+				erlangExecutablePath: "/opt/erlang/bin/erl",
 				compileOnType: false,
 				autoFetchDependencies: false,
 				workspaceSymbols: { minQueryLength: 5 },

@@ -46,6 +46,14 @@ Tells the extension to use a local release of the Expert language server instead
 
 Path to a local Elixir source directory; absolute paths are recommended.. When set, go-to-definition on Elixir standard library modules will navigate to source files in this directory instead of returning no result.
 
+### expert.server.elixirExecutablePath
+
+Path to the Elixir executable Expert should use for building and running project engines. Expert uses the path as provided without validating it. Remove the setting to clear the override.
+
+### expert.server.erlangExecutablePath
+
+Path to the Erlang `erl` executable Expert should use when resolving project runtimes. Expert uses the path as provided without validating it. Remove the setting to clear the override.
+
 ### expert.server.compileOnType
 
 Compiles open Elixir documents after each change to provide file-level diagnostics. Disable this to avoid transient compiler diagnostics while typing. Defaults to `true`.
@@ -103,6 +111,10 @@ The syntax highlighting grammar for HEEx (`~H` sigils and `*.heex` files) is mai
 
 If you are hitting Github's rate limits for unauthenticated users when the extension tries to download Expert releases, you can log in with Github.
 Open the command palette (`Command + Shift + P`), search for "Expert: Sign in with GitHub", and follow the instructions.
+
+#### Expert is not finding the correct Elixir or Erlang executables
+
+If Expert is not finding the correct Elixir or Erlang executables, you can override the paths in the extension's settings. See the `expert.server.elixirExecutablePath` and `expert.server.erlangExecutablePath` settings above.
 
 ### Support
 

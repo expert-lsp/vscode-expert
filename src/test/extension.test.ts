@@ -75,6 +75,8 @@ describe("Extension activation with configuration", () => {
 				getServerSettings: () => ({
 					logLevel: configValues.logLevel ?? "info",
 					projectDir: configValues.projectDir,
+					elixirExecutablePath: configValues.elixirExecutablePath ?? null,
+					erlangExecutablePath: configValues.erlangExecutablePath ?? null,
 					compileOnType: configValues.compileOnType ?? true,
 					autoFetchDependencies: configValues.autoFetchDependencies ?? true,
 				}),
@@ -223,6 +225,8 @@ describe("Extension activation with configuration", () => {
 						settings: {
 							logLevel: "info",
 							projectDir: undefined,
+							elixirExecutablePath: null,
+							erlangExecutablePath: null,
 							compileOnType: true,
 							autoFetchDependencies: true,
 						},
@@ -258,6 +262,54 @@ describe("Extension activation with configuration", () => {
 						settings: {
 							logLevel: "info",
 							projectDir: undefined,
+							elixirExecutablePath: null,
+							erlangExecutablePath: null,
+							compileOnType: true,
+							autoFetchDependencies: true,
+						},
+					},
+				},
+			]);
+		});
+	});
+
+	describe("when runtime executable paths change", () => {
+		it("sends configured paths and explicit nulls when they are cleared", async () => {
+			configValues = {
+				enabled: true,
+				releasePathOverride: "/server/path",
+				elixirExecutablePath: "/opt/elixir/bin/elixir",
+				erlangExecutablePath: "/opt/erlang/bin/erl",
+			};
+
+			const { activate } = await import("../extension");
+			await activate({
+				globalStorageUri: { fsPath: "/test/storage" },
+				subscriptions: [],
+			} as any);
+
+			assert.deepStrictEqual(languageClientOptions.initializationOptions, {
+				logLevel: "info",
+				projectDir: undefined,
+				elixirExecutablePath: "/opt/elixir/bin/elixir",
+				erlangExecutablePath: "/opt/erlang/bin/erl",
+				compileOnType: true,
+				autoFetchDependencies: true,
+			});
+
+			configValues.elixirExecutablePath = undefined;
+			configValues.erlangExecutablePath = undefined;
+			await languageClientOptions.middleware.workspace.didChangeConfiguration([], () => {});
+
+			assert.deepStrictEqual(sentNotifications, [
+				{
+					method: "workspace/didChangeConfiguration",
+					params: {
+						settings: {
+							logLevel: "info",
+							projectDir: undefined,
+							elixirExecutablePath: null,
+							erlangExecutablePath: null,
 							compileOnType: true,
 							autoFetchDependencies: true,
 						},
