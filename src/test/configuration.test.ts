@@ -112,6 +112,17 @@ describe("Configuration", () => {
 		});
 	});
 
+	describe("getCompileOnType", () => {
+		it("returns true by default when not configured", () => {
+			assert.strictEqual(Configuration.getCompileOnType(), true);
+		});
+
+		it("returns false when explicitly disabled", () => {
+			mockConfigValues.values = { compileOnType: false };
+			assert.strictEqual(Configuration.getCompileOnType(), false);
+		});
+	});
+
 	describe("getServerSettings", () => {
 		it("returns defaults when nothing is configured", () => {
 			assert.deepStrictEqual(Configuration.getServerSettings(), {
@@ -119,6 +130,7 @@ describe("Configuration", () => {
 				fileLogLevel: null,
 				projectDir: undefined,
 				elixirSourcePath: undefined,
+				compileOnType: true,
 				workspaceSymbols: { minQueryLength: 2 },
 			});
 		});
@@ -139,6 +151,7 @@ describe("Configuration", () => {
 				fileLogLevel: "error",
 				projectDir: "apps/my_app",
 				elixirSourcePath: "./elixir",
+				compileOnType: false,
 				"workspaceSymbols.minQueryLength": 5,
 			};
 			assert.deepStrictEqual(Configuration.getServerSettings(), {
@@ -146,6 +159,7 @@ describe("Configuration", () => {
 				fileLogLevel: "error",
 				projectDir: "apps/my_app",
 				elixirSourcePath: "./elixir",
+				compileOnType: false,
 				workspaceSymbols: { minQueryLength: 5 },
 			});
 		});

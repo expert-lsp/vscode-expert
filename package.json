@@ -170,6 +170,12 @@
           "type": "string",
           "markdownDescription": "Path to a local Elixir source directory; absolute paths are recommended.. When set, go-to-definition on Elixir standard library modules will navigate to source files in this directory instead of returning no result."
         },
+        "expert.server.compileOnType": {
+          "scope": "window",
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Compile open Elixir documents after each change to provide file-level diagnostics. Disable this to avoid transient compiler diagnostics while typing."
+        },
         "expert.server.versionManager": {
           "scope": "window",
           "type": "string",

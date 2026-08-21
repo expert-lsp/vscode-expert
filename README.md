@@ -46,6 +46,10 @@ Tells the extension to use a local release of the Expert language server instead
 
 Path to a local Elixir source directory; absolute paths are recommended.. When set, go-to-definition on Elixir standard library modules will navigate to source files in this directory instead of returning no result.
 
+### expert.server.compileOnType
+
+Compiles open Elixir documents after each change to provide file-level diagnostics. Disable this to avoid transient compiler diagnostics while typing. Defaults to `true`.
+
 ### expert.notifyOnServerAutoUpdate
 
 Controls whether notifications are shown after automatic installs of new Expert versions. Defaults to `true`.

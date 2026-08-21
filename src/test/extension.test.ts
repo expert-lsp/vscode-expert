@@ -10,6 +10,8 @@ let checkAndInstallCalled = false;
 let languageClientCreated = false;
 let languageClientArgs: { command?: string; args?: string[] } | undefined;
 let languageClientServerOptions: unknown;
+let languageClientOptions: any;
+let sentNotifications: Array<{ method: string; params: unknown }> = [];
 
 // Configuration values - set per test
 let configValues: Record<string, unknown> = {};
@@ -20,14 +22,19 @@ describe("Extension activation with configuration", () => {
 		mock.module("vscode-languageclient/node", {
 			namedExports: {
 				LanguageClient: class MockLanguageClient {
-					constructor(_id: string, _name: string, serverOptions: unknown) {
+					constructor(_id: string, _name: string, serverOptions: unknown, clientOptions: unknown) {
 						languageClientCreated = true;
 						languageClientServerOptions = serverOptions;
+						languageClientOptions = clientOptions;
 						if (typeof serverOptions === "object" && serverOptions !== null) {
 							languageClientArgs = serverOptions as { command: string; args?: string[] };
 						}
 					}
 					start() {
+						return Promise.resolve();
+					}
+					sendNotification(method: string, params: unknown) {
+						sentNotifications.push({ method, params });
 						return Promise.resolve();
 					}
 					isRunning() {
@@ -68,6 +75,7 @@ describe("Extension activation with configuration", () => {
 				getServerSettings: () => ({
 					logLevel: configValues.logLevel ?? "info",
 					projectDir: configValues.projectDir,
+					compileOnType: configValues.compileOnType ?? true,
 				}),
 				getVersionManager: () => configValues.versionManager ?? "none",
 			},
@@ -79,6 +87,8 @@ describe("Extension activation with configuration", () => {
 		languageClientCreated = false;
 		languageClientArgs = undefined;
 		languageClientServerOptions = undefined;
+		languageClientOptions = undefined;
+		sentNotifications = [];
 		mockAuthentication.session = undefined;
 		mockAuthentication.calls.length = 0;
 		configValues = {};
@@ -183,6 +193,40 @@ describe("Extension activation with configuration", () => {
 				"function",
 				"ServerOptions should be a function for TCP",
 			);
+		});
+	});
+
+	describe("when expert.server.compileOnType changes", () => {
+		it("sends the setting during initialization and configuration changes", async () => {
+			configValues = {
+				enabled: true,
+				releasePathOverride: "/server/path",
+				compileOnType: false,
+			};
+
+			const { activate } = await import("../extension");
+			await activate({
+				globalStorageUri: { fsPath: "/test/storage" },
+				subscriptions: [],
+			} as any);
+
+			assert.strictEqual(languageClientOptions.initializationOptions.compileOnType, false);
+
+			configValues.compileOnType = true;
+			await languageClientOptions.middleware.workspace.didChangeConfiguration([], () => {});
+
+			assert.deepStrictEqual(sentNotifications, [
+				{
+					method: "workspace/didChangeConfiguration",
+					params: {
+						settings: {
+							logLevel: "info",
+							projectDir: undefined,
+							compileOnType: true,
+						},
+					},
+				},
+			]);
 		});
 	});
 });
