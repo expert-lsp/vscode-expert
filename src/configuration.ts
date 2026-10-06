@@ -39,11 +39,11 @@ export function getElixirSourcePath(): string | undefined {
 }
 
 export function getElixirExecutablePath(): string | null {
-	return getBaseConfig().get<string | null>("elixirExecutablePath", null);
+	return getBaseConfig().get<string | null>("elixirExecutablePath", null) || null;
 }
 
 export function getErlangExecutablePath(): string | null {
-	return getBaseConfig().get<string | null>("erlangExecutablePath", null);
+	return getBaseConfig().get<string | null>("erlangExecutablePath", null) || null;
 }
 
 export function getCompileOnType(): boolean {

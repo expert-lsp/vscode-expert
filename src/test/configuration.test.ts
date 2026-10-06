@@ -118,6 +118,15 @@ describe("Configuration", () => {
 			assert.strictEqual(Configuration.getErlangExecutablePath(), null);
 		});
 
+		it("sends null when VS Code supplies empty string defaults", () => {
+			mockConfigValues.values = { elixirExecutablePath: "", erlangExecutablePath: "" };
+
+			assert.strictEqual(Configuration.getElixirExecutablePath(), null);
+			assert.strictEqual(Configuration.getErlangExecutablePath(), null);
+			assert.strictEqual(Configuration.getServerSettings().elixirExecutablePath, null);
+			assert.strictEqual(Configuration.getServerSettings().erlangExecutablePath, null);
+		});
+
 		it("returns the configured paths", () => {
 			mockConfigValues.values = {
 				elixirExecutablePath: "/opt/elixir/bin/elixir",
